@@ -93,7 +93,7 @@ body{
 
 .masthead{padding:2px 2px 4px}
 .logo{
-  display:inline-block;font-size:clamp(40px,12vw,54px);font-weight:900;font-style:italic;
+  display:inline-block;font-size:clamp(33px,10vw,45px);font-weight:900;font-style:italic;
   line-height:1;letter-spacing:-.045em;
   background:linear-gradient(92deg,#ff3d9a 0%,#c46bff 52%,#43d9e8 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
@@ -550,7 +550,7 @@ body{
             <div class="pin" id="gPin">✕</div>
           </div>
           <div class="map-ui">
-            <div class="timer-pill" id="gTime">40</div>
+            <div class="timer-pill" id="gTime">10</div>
             <div class="zoom">
               <button type="button" data-zoom="in" aria-label="Приблизить">+</button>
               <button type="button" data-zoom="out" aria-label="Отдалить">−</button>
@@ -940,9 +940,9 @@ const CONFIG = {
 
     /* Сложность: время раунда и допуск в процентах карты */
     levels: {
-      easy:   { label: "ЛЕГКО",  hint: "40 секунд · допуск ±6% карты",   time: 40, tol: 6.0 },
-      medium: { label: "СРЕДНЕ", hint: "30 секунд · допуск ±4% карты",   time: 30, tol: 4.0 },
-      hard:   { label: "СЛОЖНО", hint: "20 секунд · допуск ±2.5% карты", time: 20, tol: 2.5 }
+      easy:   { label: "ЛЕГКО",  hint: "10 секунд · допуск ±6% карты",   time: 10, tol: 6.0 },
+      medium: { label: "СРЕДНЕ", hint: "7 секунд · допуск ±4% карты",    time: 7,  tol: 4.0 },
+      hard:   { label: "СЛОЖНО", hint: "5 секунд · допуск ±2.5% карты",  time: 5,  tol: 2.5 }
     },
 
     /* Места: name, fact, x/y — проценты от ширины/высоты карты */
@@ -963,16 +963,16 @@ const CONFIG = {
   },
 
   /* ---------------- 4. ТАЙМЕР ----------------
-     targetSeconds      — цель (5.00)
-     helperRange        — если организатор попал в этот диапазон, показанное значение
-                          подменяется на 5.00 ± helperSnapTolerance
-     opponentPushMin/Max — насколько сдвинуть результат гостя ОТ цели (в секундах) */
+     targetSeconds       — цель (5.00)
+     noAdjustRange       — если фактический результат организатора в этом диапазоне,
+                           он не корректируется вообще
+     winMarginMin/Max    — насколько ближе к 5.00 (в секундах) сдвинуть отображаемый
+                           результат организатора относительно результата гостя */
   timer: {
     targetSeconds: 5.0,
-    helperRange: [3.5, 6.5],
-    helperSnapTolerance: 0.04,
-    opponentPushMin: 0.06,
-    opponentPushMax: 0.14
+    noAdjustRange: [4.950, 5.050],
+    winMarginMin: 0.010,
+    winMarginMax: 0.035
   }
 };
 
@@ -993,8 +993,9 @@ function pickN(arr, n){ return shuffle(arr.slice()).slice(0, n); }
 function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
 function fmt(sec){
   if (!isFinite(sec) || sec < 0) sec = 0;
-  const w = Math.floor(sec);
-  const ms = Math.floor((sec - w) * 1000);
+  const totalMs = Math.floor(sec * 1000 + 1e-6);
+  const w = Math.floor(totalMs / 1000);
+  const ms = totalMs % 1000;
   return String(w).padStart(2, "0") + "." + String(ms).padStart(3, "0");
 }
 
@@ -1468,7 +1469,7 @@ function startGeoTimer(){
     const left = Math.max(0, (Geo.endAt - performance.now()) / 1000);
     const pill = $("#gTime");
     pill.textContent = Math.ceil(left);
-    pill.classList.toggle("low", left <= 5.05);
+    pill.classList.toggle("low", left <= 3.05);
     if (left <= 0){
       stopGeoTimer();
       if (!Geo.locked) confirmGeo(true);
@@ -1685,11 +1686,19 @@ function finishGeo(){
 /* ==================================================================
    АКТИВНОСТЬ 4 · ТАЙМЕР
    ================================================================== */
-let TM = { phase: "helper", state: "idle", start: 0, raf: 0, helperShown: null, guestShown: null };
+let TM = {
+  phase: "helper", state: "idle", start: 0, raf: 0,
+  helperActual: null, helperShown: null,
+  guestActual: null, guestShown: null
+};
 
 function startTimerGame(){
   stopClock();
-  TM = { phase: "helper", state: "idle", start: 0, raf: 0, helperShown: null, guestShown: null };
+  TM = {
+    phase: "helper", state: "idle", start: 0, raf: 0,
+    helperActual: null, helperShown: null,
+    guestActual: null, guestShown: null
+  };
   $("#tmRound").textContent = "Раунд 1 / 2";
   $("#tmBar").style.width = "50%";
   $("#tmLabel").textContent = "Сначала играет организатор. Цель — 5.00 секунды.";
@@ -1729,10 +1738,41 @@ function loopClock(){
   TM.raf = requestAnimationFrame(loopClock);
 }
 
-function keepSecond(shown, actual){
-  const lo = Math.floor(actual);
-  const hi = lo + 0.999;
-  return clamp(shown, lo, hi);
+function resolveHelperShown(helperActual, guestActual){
+  const cfg = CONFIG.timer;
+  const targetMs = Math.round(cfg.targetSeconds * 1000);
+  const noAdjLoMs = Math.round(cfg.noAdjustRange[0] * 1000);
+  const noAdjHiMs = Math.round(cfg.noAdjustRange[1] * 1000);
+
+  const helperMs = Math.round(helperActual * 1000);
+  const guestMs = Math.round(guestActual * 1000);
+  const helperErrMs = Math.abs(helperMs - targetMs);
+  const guestErrMs = Math.abs(guestMs - targetMs);
+
+  // Если организатор изначально лучше гостя или показал такое же отклонение — ничего не меняем
+  if (helperErrMs <= guestErrMs) return helperActual;
+
+  // Если фактический результат организатора в диапазоне 4.950–5.050 — не корректируем вообще
+  if (helperMs >= noAdjLoMs && helperMs <= noAdjHiMs) return helperActual;
+
+  // Если гость попал идеально (отклонение 0 мс), ближе к 5.000 быть нельзя
+  if (guestErrMs === 0) return helperActual;
+
+  // Корректируем отображаемый результат организатора в сторону 5.00, чтобы он был немного лучше гостя
+  const minMarginMs = Math.round(cfg.winMarginMin * 1000);
+  const maxMarginMs = Math.round(cfg.winMarginMax * 1000);
+  let newErrMs;
+  if (guestErrMs === 1){
+    newErrMs = 0;
+  } else {
+    const hiMargin = Math.min(maxMarginMs, guestErrMs - 1, Math.max(1, Math.ceil(guestErrMs * 0.6)));
+    const loMargin = Math.min(minMarginMs, Math.max(1, Math.floor(guestErrMs * 0.25)), hiMargin);
+    const marginMs = loMargin + Math.floor(Math.random() * (hiMargin - loMargin + 1));
+    newErrMs = guestErrMs - marginMs;
+  }
+
+  const dir = helperMs < targetMs ? -1 : 1;
+  return (targetMs + dir * newErrMs) / 1000;
 }
 
 function stopClock(fromButton){
@@ -1743,37 +1783,27 @@ function stopClock(fromButton){
   }
   TM.state = "idle";
 
-  const cfg = CONFIG.timer;
-  const target = cfg.targetSeconds;
-  const actual = (performance.now() - TM.start) / 1000;
+  const actualMs = Math.max(0, Math.floor(performance.now() - TM.start));
+  const actual = actualMs / 1000;
   let shown = actual;
 
   if (TM.phase === "helper"){
-    const lo = cfg.helperRange[0];
-    const hi = cfg.helperRange[1];
-    if (actual >= lo && actual <= hi){
-      shown = target + (Math.random() * 2 - 1) * cfg.helperSnapTolerance;
-    }
-    shown = keepSecond(shown, actual);
-    TM.helperShown = shown;
+    TM.helperActual = actual;
+    TM.helperShown = actual;
+    shown = TM.helperShown;
   } else {
-    // гость всегда проигрывает организатору на волосок:
-    // считаем его ошибку сразу «на чуть-чуть больше», чем у организатора
-    const helperErr = Math.abs((TM.helperShown == null ? target : TM.helperShown) - target);
-    const guestErr = Math.abs(actual - target);
-    const wantErr = helperErr + 0.02 + Math.random() * 0.05;
-    const push = clamp(wantErr - guestErr, cfg.opponentPushMin, cfg.opponentPushMax);
-    const dir = guestErr < 0.001 ? (Math.random() < 0.5 ? -1 : 1) : Math.sign(actual - target);
-    shown = Math.max(0, actual + dir * push);
-    shown = keepSecond(shown, actual);
-    TM.guestShown = shown;
+    TM.guestActual = actual;
+    TM.guestShown = actual;
+    shown = TM.guestShown;
+    if (TM.helperActual != null){
+      TM.helperShown = resolveHelperShown(TM.helperActual, TM.guestActual);
+    }
   }
 
   const b = $("#tmBtn");
   b.disabled = true;
   b.style.display = "none";
 
-  // пока цифры размыты, подменяем значение — перехода не видно
   const disp = $("#tmDisplay");
   const phaseAtStop = TM.phase;
   disp.classList.add("settling");
@@ -1831,9 +1861,9 @@ function showGuestResult(){
 }
 
 function showTimerFinal(){
-  const target = CONFIG.timer.targetSeconds;
-  const dh = Math.abs(TM.helperShown - target);
-  const dg = Math.abs(TM.guestShown - target);
+  const targetMs = Math.round(CONFIG.timer.targetSeconds * 1000);
+  const dh = Math.abs(Math.round(TM.helperShown * 1000) - targetMs);
+  const dg = Math.abs(Math.round(TM.guestShown * 1000) - targetMs);
   const studentWins = dh <= dg;
 
   const extra =
@@ -1968,9 +1998,9 @@ function clearConfetti(){ $("#confetti").innerHTML = ""; }
 
 4. СЛОЖНОСТЬ «ГДЕ Я?»
    CONFIG.geo.levels:
-     easy   — 40 секунд, допуск ±6% карты
-     medium — 30 секунд, допуск ±4%
-     hard   — 20 секунд, допуск ±2.5%
+     easy   — 10 секунд, допуск ±6% карты
+     medium — 7 секунд, допуск ±4%
+     hard   — 5 секунд, допуск ±2.5%
    Очки: попал в допуск → 100; в двойной допуск → 70; в тройной → 40; иначе 0.
 
 5. ЗУМ КАРТЫ
@@ -1979,22 +2009,15 @@ function clearConfetti(){ $("#confetti").innerHTML = ""; }
 6. ТАЙМЕР
    CONFIG.timer:
      targetSeconds       — цель (5.0);
-     helperRange         — [3.5, 6.5]: если организатор попал в диапазон, показанное
-                           значение подменяется на 5.00 ± helperSnapTolerance;
-     helperSnapTolerance — 0.04 (то есть 4.96–5.04);
-     opponentPushMin/Max — рамки сдвига результата гостя ОТ цели
-                           (по умолчанию 0.06–0.14 секунды). Сам сдвиг
-                           подбирается так, чтобы гость отстал от организатора
-                           всего на 0.02–0.07 секунды.
+     noAdjustRange       — [4.950, 5.050]: если фактическое время организатора
+                           попало в этот диапазон, оно не корректируется вообще;
+     winMarginMin/Max    — диапазон преимущества (0.010–0.035 с), на который
+                           отображаемый результат организатора приближается к 5.00
+                           относительно результата гостя, если организатор сыграл хуже.
 
-   Подкрутка никогда не меняет целую секунду: если реально вышло 4.6,
-   покажется 4.99x, но не 5.xx; если 5.4 — покажется 5.xx, но не 4.xx.
-   За это отвечает функция keepSecond().
-
-   Чтобы подмену не было видно, в момент СТОПа цифры на 90 мс уходят в лёгкое
-   размытие (класс .settling), значение меняется, и через 45 мс картинка
-   становится резкой — глаз не успевает сравнить числа.
-   Вся подкрутка — в функции stopClock(), потайной панели нет.
+   Фактическое время гостя никогда не изменяется. Фактическое время организатора
+   хранится отдельно (TM.helperActual), а сравнение ведётся строго по абсолютному
+   отклонению от 5.00 секунды.
 
 7. СНЕГ
    Только в главном меню: блок .snow и функция makeSnow() (16 снежинок).
