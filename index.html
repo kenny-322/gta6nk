@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c15">
+<title>GTA VI · Новогоднее кафе</title>
+<style>
+/* ============================================================
+   0. БАЗА
+   ============================================================ */
+:root{
+  --bg:#0a0c15;
+  --surface:#121524;
+  --surface-2:#161a2b;
+  --line:rgba(255,255,255,.075);
+  --line-2:rgba(255,255,255,.14);
+  --ink:#f3eee6;
+  --muted:#8b8698;
+  --pink:#ff3d9a;
+  --cyan:#43d9e8;
+  --gold:#f0c04b;
+  --violet:#a874ff;
+  --good:#4ade80;
+  --bad:#ff6b7a;
+  --r:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;touch-action:manipulation;
+}
+#app{
+  position:relative;width:100%;max-width:540px;height:100dvh;margin:0 auto;overflow:hidden;
+  background:radial-gradient(110% 62% at 50% -12%,#151a33 0%,#0a0c15 62%);
+}
+
+/* ============================================================
+   1. ЭКРАНЫ И ШАПКА
+   ============================================================ */
+.screen{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:0 18px calc(24px + env(safe-area-inset-bottom));
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .26s ease,visibility .26s ease;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.screen::-webkit-scrollbar{width:0;height:0}
+.screen.active{opacity:1;visibility:visible;pointer-events:auto}
+
+.bar{
+  position:sticky;top:0;z-index:20;height:56px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:linear-gradient(180deg,rgba(10,12,21,.97) 62%,rgba(10,12,21,0));
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.back{
+  width:40px;height:40px;flex:0 0 40px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(255,255,255,.04);
+  color:var(--ink);font-size:17px;line-height:1;display:grid;place-items:center;
+  font-family:inherit;cursor:pointer;transition:background .2s;
+}
+.back:active{background:rgba(255,255,255,.1)}
+.bar-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0}
+.bar-label{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.bar-count{font-size:14px;font-weight:700;letter-spacing:.03em;font-variant-numeric:tabular-nums}
+
+.pbar{height:2px;border-radius:2px;background:rgba(255,255,255,.07);overflow:hidden;margin:2px 0 0}
+.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .3s ease}
+
+/* ============================================================
+   2. ГЛАВНОЕ МЕНЮ
+   ============================================================ */
+#scr-home{padding:0}
+.home{
+  position:relative;display:flex;flex-direction:column;justify-content:center;gap:18px;min-height:100%;
+  padding:calc(30px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+.snow{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.home > *:not(.snow){position:relative;z-index:1}
+.flake{
+  position:absolute;top:-12px;border-radius:50%;background:#fff;
+  filter:blur(.35px);animation:fall linear infinite;
+}
+@keyframes fall{
+  0%{transform:translate3d(0,-12px,0)}
+  100%{transform:translate3d(var(--drift,12px),106vh,0)}
+}
+
+.masthead{padding:2px 2px 4px}
+.logo{
+  display:inline-block;font-size:clamp(40px,12vw,54px);font-weight:900;font-style:italic;
+  line-height:1;letter-spacing:-.045em;
+  background:linear-gradient(92deg,#ff3d9a 0%,#c46bff 52%,#43d9e8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 6px 20px rgba(255,61,154,.15));
+}
+.logo-sub{
+  margin-top:9px;font-size:clamp(17px,5vw,20px);font-weight:600;
+  letter-spacing:.15em;color:#e9e3d7;
+}
+.logo-meta{
+  margin-top:7px;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);
+}
+
+.menu{display:flex;flex-direction:column;gap:10px}
+.row{
+  position:relative;display:grid;grid-template-columns:44px 1fr auto;align-items:center;
+  gap:13px;width:100%;padding:13px 15px;overflow:hidden;
+  border:1px solid var(--line);border-radius:var(--r);
+  background:linear-gradient(180deg,#131726,#10131f);
+  color:var(--ink);font-family:inherit;text-align:left;cursor:pointer;
+  transition:transform .12s ease,border-color .2s ease;
+}
+.row:active{transform:scale(.99);border-color:var(--line-2)}
+.row::after{
+  content:"";position:absolute;top:-64px;right:-52px;width:156px;height:156px;border-radius:50%;
+  background:radial-gradient(circle,var(--c) 0%,rgba(0,0,0,0) 68%);
+  opacity:.16;pointer-events:none;
+}
+.row-ico{
+  position:relative;z-index:1;width:44px;height:44px;border-radius:12px;
+  display:grid;place-items:center;font-size:20px;
+  background:var(--c-soft);border:1px solid var(--c-line);
+  box-shadow:inset 0 0 22px rgba(255,255,255,.03);
+}
+.row-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.row-title{font-size:16.5px;font-weight:700;letter-spacing:.005em}
+.row-desc{font-size:11.5px;color:var(--muted)}
+.row-num{font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.26);font-variant-numeric:tabular-nums}
+.foot{
+  display:flex;justify-content:space-between;gap:10px;padding-top:2px;
+  font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.24);
+}
+
+/* ============================================================
+   3. КНОПКИ
+   ============================================================ */
+.btn-primary{
+  display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;padding:0 18px;
+  border:0;border-radius:15px;background:var(--ink);color:#0a0c15;
+  font-family:inherit;font-size:13.5px;font-weight:800;letter-spacing:.11em;
+  cursor:pointer;transition:transform .12s ease,opacity .2s ease;
+}
+.btn-primary:active{transform:scale(.99)}
+.btn-primary:disabled{opacity:.32}
+.btn-ghost{
+  display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;padding:0 18px;
+  border:1px solid var(--line);border-radius:15px;background:transparent;color:var(--ink);
+  font-family:inherit;font-size:12.5px;font-weight:700;letter-spacing:.11em;cursor:pointer;
+}
+.btn-ghost:active{background:rgba(255,255,255,.04)}
+
+/* ============================================================
+   4. КАК ИГРАТЬ / СЛОЖНОСТЬ
+   ============================================================ */
+.howto{display:flex;flex-direction:column;gap:14px;padding:34px 2px 30px}
+.howto-ico{font-size:34px;line-height:1}
+.howto h2{margin:0;font-size:26px;font-weight:800;line-height:1.15;letter-spacing:.005em}
+.howto p{margin:0;font-size:15px;line-height:1.55;color:#b9b3c4;max-width:32ch}
+.howto .btn-primary{margin-top:16px}
+
+.diff{display:flex;flex-direction:column;gap:18px;padding:30px 2px}
+.diff h2{margin:0;font-size:26px;font-weight:800;letter-spacing:.005em}
+.diff p{margin:0;font-size:14px;line-height:1.5;color:#b9b3c4}
+.diffs{display:flex;flex-direction:column;gap:10px}
+.dif{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:15px 16px;border:1px solid var(--line);border-radius:15px;
+  background:linear-gradient(180deg,#131726,#10131f);color:var(--ink);
+  font-family:inherit;text-align:left;cursor:pointer;transition:transform .12s,border-color .2s;
+}
+.dif:active{transform:scale(.99);border-color:var(--line-2)}
+.dif b{display:block;font-size:14px;font-weight:800;letter-spacing:.13em}
+.dif small{display:block;margin-top:3px;font-size:11.5px;color:var(--muted)}
+.dif-go{font-size:20px;color:rgba(255,255,255,.28)}
+
+/* ============================================================
+   5. ИГРА: ВОПРОСЫ
+   ============================================================ */
+.play{display:flex;flex-direction:column;justify-content:center;gap:13px;min-height:calc(100dvh - 132px);padding:16px 0 10px}
+.micro{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+.qbox{
+  padding:17px 16px 19px;border:1px solid var(--line);border-radius:18px;
+  background:linear-gradient(180deg,#141828,#10131f);
+}
+.qtext{margin:9px 0 0;font-size:19px;line-height:1.38;font-weight:600;letter-spacing:.002em}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answer{
+  height:60px;border-radius:15px;border:1px solid var(--line);background:#151928;
+  color:var(--ink);font-family:inherit;font-size:14.5px;font-weight:700;letter-spacing:.1em;
+  cursor:pointer;transition:background .18s,border-color .18s,color .18s;
+}
+.answer:disabled{opacity:.5;cursor:default}
+.answer.good{opacity:1;border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.12);color:#c8f8d8}
+.answer.bad{opacity:1;border-color:rgba(255,107,122,.5);background:rgba(255,107,122,.12);color:#ffd2d7}
+
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{
+  display:flex;align-items:center;gap:11px;width:100%;min-height:54px;padding:10px 13px;
+  border:1px solid var(--line);border-radius:14px;background:#141827;color:var(--ink);
+  font-family:inherit;font-size:14.5px;line-height:1.3;text-align:left;cursor:pointer;
+  transition:background .18s,border-color .18s;
+}
+.opt:disabled{cursor:default}
+.opt-key{
+  flex:0 0 24px;height:24px;border-radius:7px;display:grid;place-items:center;
+  font-size:10.5px;font-weight:800;color:var(--muted);
+  background:rgba(255,255,255,.05);border:1px solid var(--line);
+}
+.opt.good{border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.1)}
+.opt.good .opt-key{background:var(--good);border-color:var(--good);color:#0a0c15}
+.opt.bad{border-color:rgba(255,107,122,.5);background:rgba(255,107,122,.1)}
+.opt.bad .opt-key{background:var(--bad);border-color:var(--bad);color:#0a0c15}
+
+.feedback{display:flex;flex-direction:column;gap:9px;animation:rise .22s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.verdict{font-size:23px;font-weight:900;letter-spacing:.05em;line-height:1.1}
+.verdict.ok{color:var(--good)}
+.verdict.bad{color:var(--bad)}
+.reveal{margin:0;font-size:14.5px;color:#cfc9d8}
+.reveal b{color:#fff}
+.expl{margin:0;font-size:13px;line-height:1.5;color:#a9a3b6;padding-left:11px;border-left:2px solid rgba(255,255,255,.14)}
+.tally{margin:0;font-size:9.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--muted)}
+
+/* ============================================================
+   6. «ГДЕ Я?» — КАРТА
+   ============================================================ */
+.geo{display:flex;flex-direction:column;gap:11px;padding:12px 0 10px}
+.geo-head{display:flex;flex-direction:column;gap:5px}
+.geo-name{margin:0;font-size:24px;font-weight:800;line-height:1.12;letter-spacing:.005em}
+
+.map-wrap{height:56vh;min-height:250px;display:flex;align-items:center;justify-content:center;transition:height .28s ease}
+.map-frame{
+  position:relative;border-radius:16px;overflow:hidden;background:#070a12;
+  border:1px solid var(--line);touch-action:none;user-select:none;
+  box-shadow:0 18px 44px rgba(0,0,0,.45);
+}
+.map-stage{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+.map-img{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  pointer-events:none;-webkit-user-drag:none;user-select:none;
+}
+.map-img.hd{opacity:0;transition:opacity .35s ease}
+.map-img.hd.on{opacity:1}
+.map-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.map-overlay line{stroke:#fff;stroke-width:1.3;stroke-dasharray:3 2.2;opacity:.9;vector-effect:non-scaling-stroke}
+.map-overlay .dot{fill:var(--good);stroke:#06101c;stroke-width:1.6;vector-effect:non-scaling-stroke}
+.map-overlay .zone{fill:rgba(74,222,128,.13);stroke:rgba(74,222,128,.55);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.pin{
+  position:absolute;z-index:3;display:none;place-items:center;width:26px;height:26px;
+  transform:translate(-50%,-50%) scale(calc(1/var(--s,1)));
+  font-size:21px;line-height:1;color:#fff;pointer-events:none;
+  text-shadow:0 1px 9px rgba(0,0,0,.95),0 0 16px rgba(255,61,154,.65);
+}
+.map-ui{position:absolute;inset:0;z-index:4;pointer-events:none}
+.timer-pill{
+  position:absolute;top:10px;left:10px;min-width:44px;padding:5px 10px;border-radius:99px;
+  background:rgba(6,9,17,.74);border:1px solid rgba(255,255,255,.13);
+  font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;text-align:center;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.timer-pill.low{color:#ffb3ba;border-color:rgba(255,107,122,.55)}
+.zoom{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px;pointer-events:auto}
+.zoom button{
+  width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.15);background:rgba(10,13,23,.78);
+  color:var(--ink);font-size:16px;line-height:1;font-family:inherit;cursor:pointer;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.zoom button:active{background:rgba(255,255,255,.14)}
+.map-error{position:absolute;inset:0;z-index:1;display:grid;place-items:center;padding:22px;text-align:center;font-size:12px;line-height:1.5;color:#a9a3b6;background:#0f1426}
+.map-note{margin:0;font-size:10.5px;line-height:1.4;letter-spacing:.02em;color:var(--muted);text-align:center;transition:opacity .3s}
+
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0 auto;max-width:540px;
+  display:flex;flex-direction:column;gap:8px;
+  padding:16px 18px calc(16px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line-2);border-radius:22px 22px 0 0;
+  background:linear-gradient(180deg,#161a2b,#0f1220);
+  box-shadow:0 -24px 60px rgba(0,0,0,.62);
+  animation:sheetUp .26s ease;max-height:76vh;overflow:auto;
+}
+@keyframes sheetUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.sheet-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sheet-pts{font-size:23px;font-weight:900;color:var(--good)}
+.sheet-name{font-size:17px;font-weight:800;line-height:1.2}
+.sheet-fact{margin:0;font-size:12.5px;line-height:1.45;color:#a9a3b6}
+.sheet-meta{font-size:11px;letter-spacing:.03em;color:var(--muted)}
+.sheet .btn-primary{margin-top:6px}
+
+/* ============================================================
+   7. ТАЙМЕР
+   ============================================================ */
+.timer-play{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;
+  min-height:calc(100dvh - 58px);padding:20px 0 26px;
+}
+.tm-label{margin:0;max-width:30ch;text-align:center;font-size:14px;line-height:1.45;color:#b9b3c4}
+.clock.settling{filter:blur(2.6px);opacity:.72;transition:filter .09s linear,opacity .09s linear}
+.clock{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:clamp(46px,15vw,64px);font-weight:800;line-height:1;letter-spacing:-.01em;
+  font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 42px rgba(67,217,232,.22);
+}
+.target{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.tm-btn{max-width:300px}
+.tm-btn.stop{background:linear-gradient(135deg,#ff3d9a,#ff6b7a);color:#fff}
+.tm-out{width:100%;display:flex;flex-direction:column;gap:10px;animation:rise .2s ease}
+.tm-out .btn-primary{margin-top:4px}
+
+.acc{display:flex;flex-direction:column;gap:6px;width:100%}
+.acc-track{
+  position:relative;height:6px;border-radius:99px;
+  background:linear-gradient(90deg,rgba(255,61,154,.75),rgba(240,192,75,.8) 34%,rgba(74,222,128,.9) 50%,rgba(240,192,75,.8) 66%,rgba(255,61,154,.75));
+}
+.acc-dot{
+  position:absolute;top:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;
+  background:#fff;transform:translateY(-50%);
+  box-shadow:0 0 0 3px rgba(255,255,255,.12),0 2px 8px rgba(0,0,0,.5);
+}
+.acc-cap{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.34)}
+.duel{display:flex;flex-direction:column;gap:8px;width:100%}
+.duel-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.duel-name{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.duel-val{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* ============================================================
+   8. ФИНАЛ
+   ============================================================ */
+.result{
+  display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:12px;
+  min-height:calc(100dvh - 24px);padding:40px 2px 28px;text-align:center;
+}
+.r-badge{font-size:32px;line-height:1}
+.r-title{
+  margin:0;font-size:clamp(26px,8.4vw,36px);font-weight:900;font-style:italic;letter-spacing:.01em;
+  line-height:1.06;
+  background:linear-gradient(92deg,#ff3d9a,#c46bff 52%,#43d9e8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 26px rgba(255,61,154,.22));
+}
+.r-title.soft{
+  background:none;-webkit-text-fill-color:var(--ink);color:var(--ink);
+  font-style:normal;letter-spacing:-.01em;filter:none;
+}
+.r-score{margin:0;font-size:13.5px;color:#cfc9d8}
+.r-score b{color:#fff;font-size:17px}
+.r-text{margin:2px auto 0;font-size:13.5px;line-height:1.5;color:var(--muted);max-width:32ch}
+.r-extra{
+  display:flex;flex-direction:column;gap:10px;text-align:left;
+  padding:14px;border:1px solid var(--line);border-radius:15px;background:#11141f;
+}
+.r-actions{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+
+/* конфетти */
+#confetti{position:fixed;inset:0;z-index:90;pointer-events:none;overflow:hidden}
+.conf{position:absolute;top:-16px;border-radius:1.5px;animation:confFall linear forwards}
+@keyframes confFall{
+  0%{transform:translateY(0) rotate(0);opacity:1}
+  100%{transform:translateY(105vh) rotate(620deg);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .screen{transition:none}
+  .flake{animation:none;opacity:.3}
+  .conf{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ======================= ГЛАВНОЕ МЕНЮ ======================= -->
+  <section class="screen active" id="scr-home">
+    <div class="home">
+      <div class="snow" id="snow" aria-hidden="true"></div>
+
+      <header class="masthead">
+        <div class="logo">GTA VI</div>
+        <div class="logo-sub">Новогоднее кафе</div>
+        <div class="logo-meta">Леонида · Вайс-Сити · 2026</div>
+      </header>
+
+      <div class="menu">
+        <button class="row" data-act="truth" type="button"
+                style="--c:#ff3d9a;--c-soft:rgba(255,61,154,.13);--c-line:rgba(255,61,154,.26)">
+          <span class="row-ico">🎰</span>
+          <span class="row-body">
+            <span class="row-title">Правда или ложь</span>
+            <span class="row-desc">5 утверждений о GTA</span>
+          </span>
+          <span class="row-num">01</span>
+        </button>
+
+        <button class="row" data-act="quiz" type="button"
+                style="--c:#43d9e8;--c-soft:rgba(67,217,232,.12);--c-line:rgba(67,217,232,.26)">
+          <span class="row-ico">🧩</span>
+          <span class="row-body">
+            <span class="row-title">Квиз по GTA</span>
+            <span class="row-desc">5 вопросов с вариантами</span>
+          </span>
+          <span class="row-num">02</span>
+        </button>
+
+        <button class="row" data-act="geo" type="button"
+                style="--c:#f0c04b;--c-soft:rgba(240,192,75,.12);--c-line:rgba(240,192,75,.26)">
+          <span class="row-ico">🗺️</span>
+          <span class="row-body">
+            <span class="row-title">Где я?</span>
+            <span class="row-desc">найди место на карте Лос-Сантоса</span>
+          </span>
+          <span class="row-num">03</span>
+        </button>
+
+        <button class="row" data-act="timer" type="button"
+                style="--c:#a874ff;--c-soft:rgba(168,116,255,.13);--c-line:rgba(168,116,255,.26)">
+          <span class="row-ico">⏱️</span>
+          <span class="row-body">
+            <span class="row-title">Таймер</span>
+            <span class="row-desc">дуэль: попади в 5.00 секунды</span>
+          </span>
+          <span class="row-num">04</span>
+        </button>
+      </div>
+
+      <footer class="foot">
+        <span>4 активности</span>
+        <span>приз за участие</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ======================= КАК ИГРАТЬ ======================= -->
+  <section class="screen" id="scr-howto">
+    <div class="bar">
+      <button class="back" data-back type="button" aria-label="Назад">←</button>
+      <div class="bar-right"><span class="bar-label">Инструкция</span></div>
+    </div>
+    <div class="howto">
+      <div class="howto-ico" id="hIco">🎰</div>
+      <h2 id="hTitle">Правда или ложь</h2>
+      <p id="hText"></p>
+      <button class="btn-primary" id="hGo" type="button">ПОЕХАЛИ</button>
+    </div>
+  </section>
+
+  <!-- ======================= СЛОЖНОСТЬ ======================= -->
+  <section class="screen" id="scr-diff">
+    <div class="bar">
+      <button class="back" data-back type="button" aria-label="Назад">←</button>
+      <div class="bar-right"><span class="bar-label">Сложность</span></div>
+    </div>
+    <div class="diff">
+      <div>
+        <h2 id="dTitle">Правда или ложь</h2>
+        <p id="dText" style="margin-top:8px"></p>
+      </div>
+      <div class="diffs" id="dChips"></div>
+    </div>
+  </section>
+
+  <!-- ======================= ПРАВДА ИЛИ ЛОЖЬ ======================= -->
+  <section class="screen" id="scr-truth">
+    <div class="bar">
+      <button class="back" data-back type="button" aria-label="Назад">←</button>
+      <div class="bar-right">
+        <span class="bar-label">Вопрос</span>
+        <span class="bar-count" id="tProg">1 / 5</span>
+      </div>
+    </div>
+    <div class="pbar"><i id="tBar"></i></div>
+
+    <div class="play">
+      <div class="qbox">
+        <span class="micro">Утверждение</span>
+        <p class="qtext" id="tStatement"></p>
+      </div>
+      <div class="two">
+        <button class="answer" id="tTrue" type="button">ПРАВДА</button>
+        <button class="answer" id="tFalse" type="button">ЛОЖЬ</button>
+      </div>
+      <div class="feedback" id="tFeedback" hidden>
+        <div class="verdict" id="tVerdict"></div>
+        <p class="reveal" id="tReveal"></p>
+        <p class="tally" id="tTally"></p>
+        <button class="btn-primary" id="tNext" type="button">ДАЛЬШЕ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= КВИЗ ======================= -->
+  <section class="screen" id="scr-quiz">
+    <div class="bar">
+      <button class="back" data-back type="button" aria-label="Назад">←</button>
+      <div class="bar-right">
+        <span class="bar-label">Вопрос</span>
+        <span class="bar-count" id="qProg">1 / 5</span>
+      </div>
+    </div>
+    <div class="pbar"><i id="qBar"></i></div>
+
+    <div class="play">
+      <div class="qbox">
+        <span class="micro">Вопрос</span>
+        <p class="qtext" id="qText"></p>
+      </div>
+      <div class="opts" id="qOpts"></div>
+      <div class="feedback" id="qFeedback" hidden>
+        <div class="verdict" id="qVerdict"></div>
+        <p class="expl" id="qExpl"></p>
+        <p class="tally" id="qTally"></p>
+        <button class="btn-primary" id="qNext" type="button">ДАЛЬШЕ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= ГДЕ Я? ======================= -->
+  <section class="screen" id="scr-geo">
+    <div class="bar">
+      <button class="back" data-back type="button" aria-label="Назад">←</button>
+      <div class="bar-right">
+        <span class="bar-label" id="gRound">Раунд 1 / 3</span>
+        <span class="bar-count" id="gScore">0 очков</span>
+      </div>
+    </div>
+    <div class="pbar"><i id="gBar"></i></div>
+
+    <div class="geo">
+      <div class="geo-head">
+        <span class="micro">Где находится</span>
+        <h2 class="geo-name" id="gName">—</h2>
+      </div>
+
+      <div class="map-wrap" id="mapWrap">
+        <div class="map-frame" id="mapFrame">
+          <div class="map-stage" id="mapStage">
+            <img class="map-img" id="mapBase" alt="Карта Лос-Сантоса">
+            <img class="map-img hd" id="mapHD" alt="" decoding="async">
+            <svg class="map-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <circle class="zone" id="gZone" cx="0" cy="0" r="0" style="display:none"></circle>
+              <line id="gLine" x1="0" y1="0" x2="0" y2="0" style="display:none"></line>
+              <circle class="dot" id="gDot" cx="0" cy="0" r="0.9" style="display:none"></circle>
+            </svg>
+            <div class="pin" id="gPin">✕</div>
+          </div>
+          <div class="map-ui">
+            <div class="timer-pill" id="gTime">40</div>
+            <div class="zoom">
+              <button type="button" data-zoom="in" aria-label="Приблизить">+</button>
+              <button type="button" data-zoom="out" aria-label="Отдалить">−</button>
+              <button type="button" data-zoom="reset" aria-label="Сбросить масштаб">⟲</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="map-note" id="gHint">Тапни по карте, чтобы поставить метку · пинч или +/− для зума</p>
+
+      <button class="btn-primary" id="gConfirm" type="button" disabled>ПОДТВЕРДИТЬ</button>
+      <div class="sheet" id="gResult" hidden></div>
+    </div>
+  </section>
+
+  <!-- ======================= ТАЙМЕР ======================= -->
+  <section class="screen" id="scr-timer">
+    <div class="bar">
+      <button class="back" data-back type="button" aria-label="Назад">←</button>
+      <div class="bar-right">
+        <span class="bar-label" id="tmRound">Раунд 1 / 2</span>
+      </div>
+    </div>
+    <div class="pbar"><i id="tmBar" style="width:50%"></i></div>
+
+    <div class="timer-play">
+      <p class="tm-label" id="tmLabel">Сначала играет организатор. Цель — 5.00 секунды.</p>
+      <div class="clock" id="tmDisplay">00.000</div>
+      <div class="target">Цель · 5.00</div>
+      <button class="btn-primary tm-btn" id="tmBtn" type="button">СТАРТ</button>
+      <div class="tm-out" id="tmResult" hidden></div>
+    </div>
+  </section>
+
+  <!-- ======================= ФИНАЛ ======================= -->
+  <section class="screen" id="scr-result">
+    <div class="result">
+      <div class="r-badge" id="rEmoji">🏆</div>
+      <h2 class="r-title" id="rTitle">MISSION PASSED</h2>
+      <p class="r-score" id="rScore"></p>
+      <div class="r-extra" id="rExtra" hidden></div>
+      <p class="r-text" id="rText"></p>
+      <div class="r-actions">
+        <button class="btn-primary" id="rAgain" type="button">ИГРАТЬ СНОВА</button>
+        <button class="btn-ghost" id="rHome" type="button">В МЕНЮ</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="confetti"></div>
+
+<script>
+/* ==================================================================
+   CONFIG — только данные, вся логика ниже
+   ================================================================== */
+const CONFIG = {
+
+  /* ---------------- 1. ПРАВДА ИЛИ ЛОЖЬ ---------------- */
+  truth: {
+    easy: [
+      {statement:"Действие GTA 5 происходит в Лос-Сантосе и округе Блейн.", isTrue:true},
+      {statement:"В GTA 5 три главных героя: Майкл, Франклин и Тревор.", isTrue:true},
+      {statement:"Лос-Сантос — пародия на Лос-Анджелес.", isTrue:true},
+      {statement:"Майкл живёт в особняке в Рокфорд-Хиллз.", isTrue:true},
+      {statement:"Тревор живёт в трейлере в Сэнди-Шорс.", isTrue:true},
+      {statement:"Аэропорт Лос-Сантоса находится на севере карты.", isTrue:false},
+      {statement:"Форт-Занкудо — военная база.", isTrue:true},
+      {statement:"На пирсе Дель-Пьерро есть колесо обозрения.", isTrue:true},
+      {statement:"Гора Чиллиад — самая высокая точка карты.", isTrue:true},
+      {statement:"В основной кампании GTA 5 можно играть за женщину.", isTrue:false},
+      {statement:"Майкл работает банкиром в Maze Bank.", isTrue:false},
+      {statement:"Ламар — брат Майкла.", isTrue:false},
+      {statement:"В GTA 5 есть собака по кличке Чоп.", isTrue:true},
+      {statement:"Действие GTA 5 происходит в Майами.", isTrue:false},
+      {statement:"Округ Блейн — сельская местность к северу от Лос-Сантоса.", isTrue:true},
+      {statement:"Сэнди-Шорс стоит на берегу Аламо-Си.", isTrue:true},
+      {statement:"Аламо-Си — пресное озеро в центре города.", isTrue:false},
+      {statement:"Действие GTA 6 происходит в штате Леонида.", isTrue:true},
+      {statement:"В GTA 5 нельзя летать на самолётах.", isTrue:false},
+      {statement:"Максимальный уровень розыска в GTA 5 — три звезды.", isTrue:false},
+      {statement:"Франклин замедляет время при стрельбе из снайперской винтовки.", isTrue:false},
+      {statement:"Майкл замедляет время при стрельбе.", isTrue:true},
+      {statement:"Тревор в ярости становится почти неуязвимым.", isTrue:true},
+      {statement:"Гора Чиллиад — действующий вулкан.", isTrue:false},
+      {statement:"GTA 6 вышла 19 ноября 2026 года.", isTrue:true}
+    ],
+    medium: [
+      {statement:"Особняк Майкла стоит на улице Whispymound Drive.", isTrue:true},
+      {statement:"Фамилия Майкла — Де Санта.", isTrue:true},
+      {statement:"Фамилия Тревора — Филипс.", isTrue:true},
+      {statement:"Франклин живёт в особняке в Вайнвуд-Хиллз.", isTrue:false},
+      {statement:"Лестер Крест — хакер, который планирует ограбления.", isTrue:true},
+      {statement:"Симеон Йетерян — шеф полиции Лос-Сантоса.", isTrue:false},
+      {statement:"Клуб Vanilla Unicorn достаётся Тревору.", isTrue:true},
+      {statement:"Ограбление банка в Палето-Бей называется The Paleto Score.", isTrue:true},
+      {statement:"Первое крупное ограбление в сюжете — ювелирный магазин Vangelico.", isTrue:true},
+      {statement:"GTA Online вышла в один день с GTA 5.", isTrue:false},
+      {statement:"Майкла озвучил Нед Люк.", isTrue:true},
+      {statement:"Франклина озвучил Шон Фонтено.", isTrue:true},
+      {statement:"Тревора озвучил Стивен Огг.", isTrue:true},
+      {statement:"В GTA 5 нет радиостанций — только один саундтрек.", isTrue:false},
+      {statement:"Обсерватория Галилео — пародия на Эйфелеву башню.", isTrue:false},
+      {statement:"Люсия из GTA 6 носит на ноге электронный браслет.", isTrue:true},
+      {statement:"В Форт-Занкудо можно угнать военный истребитель.", isTrue:true},
+      {statement:"Аламо-Си — пародия на Солтон-Си.", isTrue:true},
+      {statement:"GTA 5 вышла в 2015 году.", isTrue:false},
+      {statement:"Пролог GTA 5 происходит в 1980-х во Вайс-Сити.", isTrue:false},
+      {statement:"Дэйв Нортон — агент FIB.", isTrue:true},
+      {statement:"«Кайффлом» — приветствие культа Эпсилон.", isTrue:true},
+      {statement:"Trevor Philips Industries — бизнес Тревора.", isTrue:true},
+      {statement:"Главные герои GTA 6 — Джейсон и Люсия.", isTrue:true},
+      {statement:"На горе Гордо ночью можно встретить призрак.", isTrue:true}
+    ],
+    hard: [
+      {statement:"Пролог GTA 5 происходит в 2004 году в Ладендорфе.", isTrue:true},
+      {statement:"Брэд Снайдер погибает в прологе, а Майкл инсценирует свою смерть.", isTrue:true},
+      {statement:"Самая высокая гора в игре — гора Гордо.", isTrue:false},
+      {statement:"В концовке C погибают все трое главных героев.", isTrue:false},
+      {statement:"Мурал на вершине Чиллиада показывает НЛО, яйцо и джетпак.", isTrue:true},
+      {statement:"НЛО над Чиллиадом появляется в грозу в 3:00 ночи.", isTrue:true},
+      {statement:"Аэропорт LSIA — это морской порт Лос-Сантоса.", isTrue:false},
+      {statement:"В GTA 5 есть боулинг.", isTrue:false},
+      {statement:"Гольф, теннис и триатлон есть в GTA 5.", isTrue:true},
+      {statement:"Доктор Фридлендер — психотерапевт Майкла.", isTrue:true},
+      {statement:"Лестер Крест ходит с тростью.", isTrue:true},
+      {statement:"Порт Лос-Сантоса находится в округе Блейн.", isTrue:false},
+      {statement:"Чоп — ротвейлер, который принадлежит Ламару.", isTrue:true},
+      {statement:"Франклин вырос в районе Чемберлен-Хиллз.", isTrue:true},
+      {statement:"Финал The Big Score — ограбление банка в Палето-Бей.", isTrue:false},
+      {statement:"В GTA 5 нельзя покупать недвижимость.", isTrue:false},
+      {statement:"Стив Хейнс — агент FIB.", isTrue:true},
+      {statement:"Майкл снимается в кино у продюсера Соломона Ричардса.", isTrue:true},
+      {statement:"В GTA 5 есть подводная лодка.", isTrue:true},
+      {statement:"Знак VINEWOOD стоит на горе Чиллиад.", isTrue:false},
+      {statement:"Аманда — жена Майкла.", isTrue:true},
+      {statement:"В GTA 6 шесть основных регионов, включая Вайс-Сити и Маунт-Калага.", isTrue:true},
+      {statement:"В GTA 5 нельзя плавать.", isTrue:false},
+      {statement:"Три главных героя переключаются на крестовине геймпада.", isTrue:true},
+      {statement:"Штат Леонида в GTA 6 — пародия на Флориду.", isTrue:true}
+    ]
+  },
+
+  /* ---------------- 2. КВИЗ ---------------- */
+  quiz: {
+    easy: [
+      {question:"В каком городе происходит действие GTA 5?",
+       options:["Лос-Сантос","Вайс-Сити","Либерти-Сити","Карсер-Сити"], correct:"Лос-Сантос",
+       explanation:"Лос-Сантос — пародия на Лос-Анджелес; вместе с округом Блейн он и есть карта GTA 5."},
+      {question:"Сколько главных героев в GTA 5?",
+       options:["2","3","4","1"], correct:"3",
+       explanation:"Майкл, Франклин и Тревор — между ними можно переключаться."},
+      {question:"Кто из героев живёт в особняке в Рокфорд-Хиллз?",
+       options:["Майкл","Тревор","Франклин","Ламар"], correct:"Майкл",
+       explanation:"Майкл Де Санта живёт в Рокфорд-Хиллз на Whispymound Drive."},
+      {question:"Кто живёт в трейлере в Сэнди-Шорс?",
+       options:["Тревор","Майкл","Франклин","Лестер"], correct:"Тревор",
+       explanation:"Трейлер Тревора стоит у Аламо-Си, рядом с Сэнди-Шорс."},
+      {question:"Какой реальный город пародирует Лос-Сантос?",
+       options:["Лос-Анджелес","Нью-Йорк","Майами","Чикаго"], correct:"Лос-Анджелес",
+       explanation:"Лос-Сантос — Лос-Анджелес, Вайнвуд — Голливуд, округ Блейн — глубокая провинция."},
+      {question:"Как называется военная база на западе карты?",
+       options:["Форт-Занкудо","Форт-Карсон","База Маккензи","Форт-Брэддок"], correct:"Форт-Занкудо",
+       explanation:"Форт-Занкудо — военная база в округе Блейн, там стоят истребители."},
+      {question:"Что стоит на пирсе Дель-Пьерро?",
+       options:["Колесо обозрения","Маяк","Стадион","Статуя свободы"], correct:"Колесо обозрения",
+       explanation:"Дель-Пьерро — пародия на Санта-Монику: пирс с колесом обозрения и аттракционами."},
+      {question:"Как называется высочайшая гора карты?",
+       options:["Гора Чиллиад","Гора Гордо","Гора Джошиа","Гора Кейп-Кэтфиш"], correct:"Гора Чиллиад",
+       explanation:"На Чиллиад ведёт канатная дорога, а на вершине стоит смотровая площадка."},
+      {question:"Где находится аэропорт Лос-Сантоса?",
+       options:["На юге города","На севере карты","В пустыне","На горе Чиллиад"], correct:"На юге города",
+       explanation:"LSIA стоит на юге Лос-Сантоса, рядом с портом."},
+      {question:"Кто лучший друг Франклина?",
+       options:["Ламар","Лестер","Дэйв Нортон","Соломон Ричардс"], correct:"Ламар",
+       explanation:"Ламар Дэвис — друг детства Франклина и его напарник по «делам»."},
+      {question:"Как зовут собаку Ламара?",
+       options:["Чоп","Рекс","Бруно","Титан"], correct:"Чоп",
+       explanation:"Чоп — ротвейлер Ламара, с ним есть отдельная миссия."},
+      {question:"Как называется город, в котором разворачивается действие GTA 6?",
+       options:["Вайс-Сити","Лос-Сантос","Либерти-Сити","Вайс-Бич"], correct:"Вайс-Сити",
+       explanation:"Вайс-Сити — версия Майами, центр штата Леонида."},
+      {question:"Что такое Аламо-Си?",
+       options:["Озеро","Гора","Река","Пляж"], correct:"Озеро",
+       explanation:"Аламо-Си — солёное озеро в центре карты, пародия на Солтон-Си."},
+      {question:"В каком году вышла GTA 5?",
+       options:["2013","2011","2015","2017"], correct:"2013",
+       explanation:"17 сентября 2013 года на PS3 и Xbox 360."},
+      {question:"Какая способность у Франклина?",
+       options:["Замедление времени за рулём","Ярость","Невидимость","Бег по воде"], correct:"Замедление времени за рулём",
+       explanation:"Франклин замедляет время, когда ведёт машину или мотоцикл."},
+      {question:"Какая способность у Тревора?",
+       options:["Ярость и неуязвимость","Замедление времени в бою","Взлом","Лечение"], correct:"Ярость и неуязвимость",
+       explanation:"В ярости Тревор наносит двойной урон и почти не получает урона."},
+      {question:"Какая способность у Майкла?",
+       options:["Замедление времени при стрельбе","Ярость","Ускорение","Полёт"], correct:"Замедление времени при стрельбе",
+       explanation:"Майкл включает «пулевое время» и точнее стреляет."},
+      {question:"Максимальный уровень розыска в GTA 5?",
+       options:["5 звёзд","3 звезды","6 звёзд","4 звезды"], correct:"5 звёзд",
+       explanation:"Пять звёзд — полиция, вертолёты, а на высшем уровне и военные."},
+      {question:"Что такое Maze Bank?",
+       options:["Небоскрёб-банк","Аэропорт","Военная база","Пирс"], correct:"Небоскрёб-банк",
+       explanation:"Maze Bank Tower — самый высокий небоскрёб даунтауна Лос-Сантоса."},
+      {question:"На каком пляже есть уличные тренажёры?",
+       options:["Веспуччи","Палето-Бей","Сэнди-Шорс","Чумаш"], correct:"Веспуччи",
+       explanation:"Пляж Веспуччи — пародия на Венис-Бич, там «Muscle Beach» с тренажёрами."},
+      {question:"В каком городке на севере герои грабят банк?",
+       options:["Палето-Бей","Сэнди-Шорс","Грэпсид","Миррор-Парк"], correct:"Палето-Бей",
+       explanation:"Палето-Бей — тихий городок на северном побережье, там проходит The Paleto Score."},
+      {question:"Что написано на знаке в холмах над городом?",
+       options:["VINEWOOD","HOLLYWOOD","LOS SANTOS","VINEWOODLAND"], correct:"VINEWOOD",
+       explanation:"Знак VINEWOOD — пародия на голливудский знак, стоит в Вайнвуд-Хиллз."},
+      {question:"Кто такой Лестер Крест?",
+       options:["Хакер и организатор ограблений","Полицейский","Таксист","Банкир"], correct:"Хакер и организатор ограблений",
+       explanation:"Лестер — хакер с тростью, он планирует ограбления для всех трёх героев."},
+      {question:"Какой клуб достаётся Тревору?",
+       options:["Vanilla Unicorn","Tequi-la-la","Bahama Mamas","Hornbills"], correct:"Vanilla Unicorn",
+       explanation:"Тревор получает стриптиз-клуб Vanilla Unicorn и становится его владельцем."},
+      {question:"Кто главные герои GTA 6?",
+       options:["Джейсон и Люсия","Майкл и Франклин","Тревор и Ламар","Джейсон и Линда"], correct:"Джейсон и Люсия",
+       explanation:"Джейсон Дуваль и Люсия Каминос — пара протагонистов GTA 6."}
+    ],
+    medium: [
+      {question:"Фамилия Майкла?",
+       options:["Де Санта","Таунли","Клинтон","Филипс"], correct:"Де Санта",
+       explanation:"Майкл Де Санта — бывший грабитель банков, ушедший на покой."},
+      {question:"Фамилия Франклина?",
+       options:["Клинтон","Де Санта","Нортон","Огг"], correct:"Клинтон",
+       explanation:"Франклин Клинтон вырос в Чемберлен-Хиллз и работал на автосалон."},
+      {question:"Фамилия Тревора?",
+       options:["Филипс","Де Санта","Клинтон","Мадразо"], correct:"Филипс",
+       explanation:"Тревор Филипс — третий герой, живёт в Сэнди-Шорс."},
+      {question:"У кого живёт Франклин в начале игры?",
+       options:["У тёти Дениз","У Майкла","У Лестера","У Ламара"], correct:"У тёти Дениз",
+       explanation:"Франклин живёт в доме тёти Дениз в Чемберлен-Хиллз."},
+      {question:"Как называется автосалон, где работает Франклин?",
+       options:["Premium Deluxe Motorsport","Los Santos Customs","Benny's","Ammu-Nation"], correct:"Premium Deluxe Motorsport",
+       explanation:"Premium Deluxe Motorsport — салон Симеона Йетеряна, туда Франклин возит угнанные машины."},
+      {question:"Кто владелец салона Premium Deluxe Motorsport?",
+       options:["Симеон Йетерян","Ламар Дэвис","Лестер Крест","Мартин Мадразо"], correct:"Симеон Йетерян",
+       explanation:"Симеон Йетерян — хитрый торговец машинами, первый работодатель Франклина."},
+      {question:"Как называется первое крупное ограбление в сюжете?",
+       options:["Ювелирный магазин Vangelico","Банк в Палето-Бей","The Big Score","Ограбление FIB"], correct:"Ювелирный магазин Vangelico",
+       explanation:"Vangelico — ювелирный магазин в Рокфорд-Хиллз, первое дело новой команды."},
+      {question:"Как называется ограбление банка в Палето-Бей?",
+       options:["The Paleto Score","The Big Score","Blitz Play","The Bureau Raid"], correct:"The Paleto Score",
+       explanation:"The Paleto Score — налёт на банк в Палето-Бей, один из самых громких в игре."},
+      {question:"Кто озвучил Майкла?",
+       options:["Нед Люк","Шон Фонтено","Стивен Огг","Трой Бэйкер"], correct:"Нед Люк",
+       explanation:"Нед Люк — актёр и голос Майкла Де Санты."},
+      {question:"Кто озвучил Франклина?",
+       options:["Шон Фонтено","Нед Люк","Стивен Огг","Нолан Норт"], correct:"Шон Фонтено",
+       explanation:"Шон Фонтено озвучил Франклина Клинтона."},
+      {question:"Кто озвучил Тревора?",
+       options:["Стивен Огг","Шон Фонтено","Нед Люк","Джон Хэмм"], correct:"Стивен Огг",
+       explanation:"Стивен Огг — голос Тревора Филипса."},
+      {question:"Как называется поп-радиостанция в GTA 5?",
+       options:["Non-Stop-Pop FM","West Coast Classics","Blaine County Radio","FlyLo FM"], correct:"Non-Stop-Pop FM",
+       explanation:"Non-Stop-Pop FM — поп-хиты; в игре больше десятка радиостанций."},
+      {question:"На что похожа обсерватория Галилео?",
+       options:["На обсерваторию Гриффита","На Эйфелеву башню","На Колизей","На Белый дом"], correct:"На обсерваторию Гриффита",
+       explanation:"Galileo Observatory — пародия на Griffith Observatory в Лос-Анджелесе."},
+      {question:"Kortz Center — пародия на...",
+       options:["Музей Гетти","Лувр","Тейт Модерн","Смитсоновский музей"], correct:"Музей Гетти",
+       explanation:"Kortz Center списан с музея Гетти — белые павильоны на холме."},
+      {question:"Где происходит пролог GTA 5?",
+       options:["В Ладендорфе, Северный Янктон","В Лос-Сантосе","В Вайс-Сити","В Либерти-Сити"], correct:"В Ладендорфе, Северный Янктон",
+       explanation:"Пролог — ограбление банка в заснеженном Ладендорфе в 2004 году."},
+      {question:"В каком году происходит пролог GTA 5?",
+       options:["2004","1992","2013","1987"], correct:"2004",
+       explanation:"События пролога — 2004 год, за девять лет до основной истории."},
+      {question:"Кто такой Дэйв Нортон?",
+       options:["Агент FIB","Полицейский","Банкир","Адвокат"], correct:"Агент FIB",
+       explanation:"Дэйв Нортон — агент FIB, старый знакомый Майкла по «грязным делам»."},
+      {question:"Что означает «Кайффлом»?",
+       options:["Приветствие культа Эпсилон","Название оружия","Кличку собаки","Название района"], correct:"Приветствие культа Эпсилон",
+       explanation:"Kifflom! — приветствие культа Эпсилон, к которому втягивают Майкла."},
+      {question:"Что производит Trevor Philips Industries?",
+       options:["Метамфетамин","Оружие","Вино","Одежду"], correct:"Метамфетамин",
+       explanation:"Тревор варит и продаёт метамфетамин вместе с бандой в округе Блейн."},
+      {question:"На что похож штат Леонида из GTA 6?",
+       options:["На Флориду","На Калифорнию","На Нью-Йорк","На Техас"], correct:"На Флориду",
+       explanation:"Леонида — вымышленная Флорида, а Вайс-Сити — её Майами."},
+      {question:"Когда вышла GTA Online?",
+       options:["1 октября 2013","17 сентября 2013","1 января 2014","17 сентября 2015"], correct:"1 октября 2013",
+       explanation:"GTA Online запустили 1 октября 2013 года, через две недели после GTA 5."},
+      {question:"Что такое Vanilla Unicorn?",
+       options:["Стриптиз-клуб","Банк","Ресторан","Отель"], correct:"Стриптиз-клуб",
+       explanation:"Vanilla Unicorn — клуб, который Тревор получает после одной из миссий."},
+      {question:"Кто такой Соломон Ричардс?",
+       options:["Кинопродюсер","Полицейский","Банкир","Хакер"], correct:"Кинопродюсер",
+       explanation:"Соломон Ричардс — продюсер киностудии Richards Majestic, с ним работает Майкл."},
+      {question:"Где находится Форт-Занкудо?",
+       options:["На западном побережье Блейна","В центре Лос-Сантоса","На востоке карты","В аэропорту"], correct:"На западном побережье Блейна",
+       explanation:"Форт-Занкудо стоит на западном берегу, у шоссе вдоль океана."},
+      {question:"Какой регион GTA 6 — пародия на Эверглейдс?",
+       options:["Грассриверс","Леонида-Кис","Амброзия","Маунт-Калага"], correct:"Грассриверс",
+       explanation:"Grassrivers — болота и протоки, местная версия Эверглейдс."}
+    ],
+    hard: [
+      {question:"Сколько концовок в сюжете GTA 5?",
+       options:["3","2","4","1"], correct:"3",
+       explanation:"A, B и C: убить Майкла, убить Тревора или сохранить всех."},
+      {question:"Что происходит в концовке C?",
+       options:["Все трое выживают","Погибает Майкл","Погибает Тревор","Погибает Франклин"], correct:"Все трое выживают",
+       explanation:"В финале C герои объединяются против общих врагов, и все остаются живы."},
+      {question:"Что герои используют в ограблении Blitz Play?",
+       options:["Мусоровоз","Танк","Поезд","Вертолёт"], correct:"Мусоровоз",
+       explanation:"Мусоровоз перекрывает дорогу инкассаторской машине — так начинается Blitz Play."},
+      {question:"Кто помогает героям с ограблением FIB?",
+       options:["Стив Хейнс","Соломон Ричардс","Симеон Йетерян","Мартин Мадразо"], correct:"Стив Хейнс",
+       explanation:"Стив Хейнс — агент FIB, который давит на героев и требует «услуг»."},
+      {question:"Сколько частей космического корабля нужно собрать Омеге?",
+       options:["50","25","100","10"], correct:"50",
+       explanation:"Омега просит найти 50 обломков корабля по всей карте."},
+      {question:"Кто собирает части космического корабля?",
+       options:["Омега","Лестер","Ламар","Соломон"], correct:"Омега",
+       explanation:"Омега — конспиролог из пустыни, у него странная коллекция."},
+      {question:"Что появляется над Чиллиадом в грозу в 3:00 ночи?",
+       options:["НЛО","Вертолёт","Призрак","Клад"], correct:"НЛО",
+       explanation:"Классическая пасхалка: в грозу на вершине Чиллиада появляется летающая тарелка."},
+      {question:"Кто такой Мартин Мадразо?",
+       options:["Наркобарон","Кинопродюсер","Агент FIB","Банкир"], correct:"Наркобарон",
+       explanation:"Мартин Мадразо — влиятельный наркобарон, у него крупный особняк в Вайнвуд-Хиллз."},
+      {question:"Как называется финальное ограбление в сюжете?",
+       options:["The Big Score","The Paleto Score","Blitz Play","The Bureau Raid"], correct:"The Big Score",
+       explanation:"The Big Score — финальное ограбление, самое крупное дело героев."},
+      {question:"Кто такая Патриция Мадразо?",
+       options:["Жена Мартина Мадразо","Сестра Майкла","Агент FIB","Певица"], correct:"Жена Мартина Мадразо",
+       explanation:"Тревор увозит Патрицию Мадразо, и они неожиданно становятся друзьями."},
+      {question:"Сколько сюжетных миссий в GTA 5?",
+       options:["69","50","100","45"], correct:"69",
+       explanation:"В основной сюжетной линии GTA 5 — 69 миссий, плюс побочные задания."},
+      {question:"Кто такая Дениз Клинтон?",
+       options:["Тётя Франклина","Сестра Майкла","Агент FIB","Банкир"], correct:"Тётя Франклина",
+       explanation:"Дениз Клинтон — тётя Франклина, у неё он и живёт в начале игры."},
+      {question:"Где находится порт Лос-Сантоса?",
+       options:["На Элизиан-Айленд","В Палето-Бей","В Сэнди-Шорс","На горе Чиллиад"], correct:"На Элизиан-Айленд",
+       explanation:"Elysian Island — промышленный остров с портом и контейнерным терминалом."},
+      {question:"Какая песня звучит в первом трейлере GTA 6?",
+       options:["Love Is a Long Road — Tom Petty","Hot Together — Pointer Sisters","Blinding Lights — The Weeknd","In the Air Tonight — Phil Collins"], correct:"Love Is a Long Road — Tom Petty",
+       explanation:"Первый трейлер GTA 6 (декабрь 2023) шёл под «Love Is a Long Road» Тома Петти."},
+      {question:"Кто такой Уэйд Херберт?",
+       options:["Друг Тревора","Агент FIB","Банкир","Кинопродюсер"], correct:"Друг Тревора",
+       explanation:"Уэйд — простоватый приятель Тревора, который живёт в трейлерном парке."},
+      {question:"Когда вышла GTA 6?",
+       options:["19 ноября 2026","26 мая 2026","17 сентября 2026","19 декабря 2026"], correct:"19 ноября 2026",
+       explanation:"После переноса с мая 2026 года Rockstar назвала новую дату — 19 ноября 2026."},
+      {question:"Какой герой GTA 5 занимается йогой?",
+       options:["Майкл","Тревор","Франклин","Лестер"], correct:"Майкл",
+       explanation:"Майкл по настоянию жены ходит на йогу к инструктору Фабиену."},
+      {question:"На каких платформах GTA 6 вышла на старте?",
+       options:["PS5 и Xbox Series X|S","Только ПК","PS4 и Xbox One","Nintendo Switch"], correct:"PS5 и Xbox Series X|S",
+       explanation:"Стартовые платформы — PlayStation 5 и Xbox Series X|S."},
+      {question:"Где можно угнать военный истребитель?",
+       options:["В Форт-Занкудо","В аэропорту LSIA","На пирсе","В Палето-Бей"], correct:"В Форт-Занкудо",
+       explanation:"На военной базе Форт-Занкудо стоит истребитель P-996 Lazer."},
+      {question:"Что находится на вершине горы Чиллиад?",
+       options:["Канатная дорога и смотровая","Казино","Аэропорт","Особняк"], correct:"Канатная дорога и смотровая",
+       explanation:"На Чиллиад поднимается канатная дорога, наверху — смотровая площадка и мурал."},
+      {question:"Кто такой Фабиен?",
+       options:["Инструктор по йоге","Агент FIB","Банкир","Наркобарон"], correct:"Инструктор по йоге",
+       explanation:"Фабиен — йога-инструктор Аманды, с ним у Майкла отдельная миссия."},
+      {question:"Что такое Los Santos Customs?",
+       options:["Ателье тюнинга","Банк","Полиция","Аэропорт"], correct:"Ателье тюнинга",
+       explanation:"Los Santos Customs — сеть мастерских, где тюнингуют и красят машины."},
+      {question:"Что происходит с доктором Фридлендером в конце игры?",
+       options:["Уезжает из города","Погибает","Становится мэром","Садится в тюрьму"], correct:"Уезжает из города",
+       explanation:"Психотерапевт Майкла закрывает практику и уезжает из Лос-Сантоса."},
+      {question:"Какая порода у Чопа?",
+       options:["Ротвейлер","Доберман","Лабрадор","Питбуль"], correct:"Ротвейлер",
+       explanation:"Чоп — ротвейлер Ламара; в GTA 5 его можно выгуливать и играть с ним."},
+      {question:"Сколько основных регионов в штате Леонида из GTA 6?",
+       options:["6","4","8","3"], correct:"6",
+       explanation:"Вайс-Сити, Леонида-Кис, Грассриверс, Порт-Геллхорн, Амброзия и Маунт-Калага."}
+    ]
+  },
+
+  /* ---------------- 3. ГДЕ Я? ---------------- */
+  geo: {
+    /* Карта: файлы лежат рядом с index.html */
+    mapImage: "map.jpg",
+    mapHD: "map-hd.jpg",
+    rounds: 3,
+
+    /* Сложность: время раунда и допуск в процентах карты */
+    levels: {
+      easy:   { label: "ЛЕГКО",  hint: "40 секунд · допуск ±6% карты",   time: 40, tol: 6.0 },
+      medium: { label: "СРЕДНЕ", hint: "30 секунд · допуск ±4% карты",   time: 30, tol: 4.0 },
+      hard:   { label: "СЛОЖНО", hint: "20 секунд · допуск ±2.5% карты", time: 20, tol: 2.5 }
+    },
+
+    /* Места: name, fact, x/y — проценты от ширины/высоты карты */
+    places: [
+      { name: "Аэропорт Лос-Сантоса", fact: "LSIA: главные ворота штата, отсюда начинается почти любой побег из города.", x: 32.0, y: 88.3 },
+      { name: "Порт Лос-Сантоса", fact: "Контейнерные терминалы Элизиан-Айленда — сюда приходит почти весь груз штата.", x: 47.5, y: 92.3 },
+      { name: "Пирс Дель-Пьерро", fact: "Пирс с колесом обозрения — местная версия пирса Санта-Моники.", x: 27.0, y: 76.7 },
+      { name: "Пляж Веспуччи", fact: "Пляж с набережной, скейт-парком и уличными тренажёрами.", x: 29.0, y: 75.0 },
+      { name: "Форт-Занкудо", fact: "Военная база на западном побережье: охрана, танки и истребители.", x: 19.5, y: 41.0 },
+      { name: "Гора Чиллиад", fact: "Высочайшая точка карты, канатная дорога и загадочный мурал на вершине.", x: 46.3, y: 20.8 },
+      { name: "Аламо-Си", fact: "Солёное озеро в центре карты — пародия на Солтон-Си.", x: 61.0, y: 33.5 },
+      { name: "Сэнди-Шорс", fact: "Городок в пустыне у Аламо-Си — дом Тревора.", x: 60.8, y: 37.6 },
+      { name: "Палето-Бей", fact: "Тихий городок на северном побережье и место знаменитого ограбления банка.", x: 42.0, y: 16.0 },
+      { name: "Грейпсид", fact: "Фермерский край на северо-востоке: поля, ранчо и тракторы.", x: 69.0, y: 29.0 },
+      { name: "Маунт-Гордо", fact: "Мыс на северо-востоке: здесь ночью можно встретить призрак.", x: 75.0, y: 20.5 },
+      { name: "Даунтаун Лос-Сантоса", fact: "Стеклянные башни, Maze Bank и вечные пробки.", x: 41.0, y: 70.0 }
+    ]
+  },
+
+  /* ---------------- 4. ТАЙМЕР ----------------
+     targetSeconds      — цель (5.00)
+     helperRange        — если организатор попал в этот диапазон, показанное значение
+                          подменяется на 5.00 ± helperSnapTolerance
+     opponentPushMin/Max — насколько сдвинуть результат гостя ОТ цели (в секундах) */
+  timer: {
+    targetSeconds: 5.0,
+    helperRange: [3.5, 6.5],
+    helperSnapTolerance: 0.04,
+    opponentPushMin: 0.06,
+    opponentPushMax: 0.14
+  }
+};
+
+/* ==================================================================
+   УТИЛИТЫ
+   ================================================================== */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+function shuffle(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+function pickN(arr, n){ return shuffle(arr.slice()).slice(0, n); }
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+function fmt(sec){
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const w = Math.floor(sec);
+  const ms = Math.floor((sec - w) * 1000);
+  return String(w).padStart(2, "0") + "." + String(ms).padStart(3, "0");
+}
+
+/* ==================================================================
+   ЭКРАНЫ
+   ================================================================== */
+let current = "scr-home";
+const state = { act: null, diff: null };
+
+function show(id){
+  const next = document.getElementById(id);
+  if (!next) return;
+  $$(".screen.active").forEach(s => s.classList.remove("active"));
+  next.classList.add("active");
+  next.scrollTop = 0;
+  current = id;
+  if (id === "scr-geo") requestAnimationFrame(sizeMap);
+}
+
+function goHome(){
+  stopClock();
+  stopGeoTimer();
+  clearConfetti();
+  state.act = null;
+  show("scr-home");
+}
+
+document.addEventListener("click", function(e){
+  if (e.target.closest("[data-back]")) goHome();
+});
+
+/* ==================================================================
+   СНЕГ (только главное меню)
+   ================================================================== */
+(function makeSnow(){
+  const box = $("#snow");
+  if (!box) return;
+  for (let i = 0; i < 16; i++){
+    const f = document.createElement("i");
+    f.className = "flake";
+    const size = 2.5 + Math.random() * 3.5;
+    f.style.width = size.toFixed(1) + "px";
+    f.style.height = size.toFixed(1) + "px";
+    f.style.left = (Math.random() * 100).toFixed(1) + "%";
+    f.style.opacity = (0.22 + Math.random() * 0.3).toFixed(2);
+    f.style.animationDuration = (15 + Math.random() * 13).toFixed(1) + "s";
+    f.style.animationDelay = (-Math.random() * 28).toFixed(1) + "s";
+    f.style.setProperty("--drift", (Math.random() * 46 - 23).toFixed(0) + "px");
+    box.appendChild(f);
+  }
+})();
+
+/* ==================================================================
+   ГЛАВНОЕ МЕНЮ
+   ================================================================== */
+const ACTS = {
+  truth: {
+    ico: "🎰", title: "Правда или ложь",
+    howto: "5 утверждений о GTA. Реши, где правда, а где выдумка. Это не экзамен — отвечай как чувствуешь."
+  },
+  quiz: {
+    ico: "🧩", title: "Квиз по GTA",
+    howto: "5 вопросов, 4 варианта. Выбери один — после ответа будет короткий факт."
+  },
+  geo: {
+    ico: "🗺️", title: "Где я?",
+    howto: "Тебе назовут место в Лос-Сантосе. Найди его на карте, приблизь и поставь метку. Три раунда."
+  },
+  timer: {
+    ico: "⏱️", title: "Таймер",
+    howto: "Попади как можно ближе к 5.00 секунды. Сначала играет организатор, потом гость. Побеждает тот, кто точнее."
+  }
+};
+
+$$(".row").forEach(function(row){
+  row.addEventListener("click", function(){ openHowto(row.dataset.act); });
+});
+
+function openHowto(act){
+  state.act = act;
+  $("#hIco").textContent = ACTS[act].ico;
+  $("#hTitle").textContent = ACTS[act].title;
+  $("#hText").textContent = ACTS[act].howto;
+  show("scr-howto");
+}
+
+$("#hGo").addEventListener("click", function(){
+  if (state.act === "timer") startTimerGame();
+  else showDiff(state.act);
+});
+
+/* ==================================================================
+   СЛОЖНОСТЬ
+   ================================================================== */
+function diffOptions(act){
+  if (act === "geo"){
+    const lv = CONFIG.geo.levels;
+    return ["easy", "medium", "hard"].map(function(k){
+      return { key: k, label: lv[k].label, hint: lv[k].hint };
+    });
+  }
+  return [
+    { key: "easy",   label: "ЛЕГКО",  hint: "для новичков" },
+    { key: "medium", label: "СРЕДНЕ", hint: "если уже играл в GTA" },
+    { key: "hard",   label: "СЛОЖНО", hint: "для фанатов серии" }
+  ];
+}
+
+function showDiff(act){
+  state.act = act;
+  $("#dTitle").textContent = ACTS[act].title;
+  $("#dText").textContent = act === "geo"
+    ? "Выбери уровень: от него зависит время раунда и точность попадания."
+    : "Выбери уровень — от него зависит, какие вопросы попадутся.";
+
+  const box = $("#dChips");
+  box.innerHTML = "";
+  diffOptions(act).forEach(function(o){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "dif";
+    b.innerHTML = '<span><b>' + o.label + '</b><small>' + o.hint + '</small></span><span class="dif-go">›</span>';
+    b.addEventListener("click", function(){
+      if (act === "truth") startTruth(o.key);
+      else if (act === "quiz") startQuiz(o.key);
+      else startGeo(o.key);
+    });
+    box.appendChild(b);
+  });
+  show("scr-diff");
+}
+
+/* ==================================================================
+   АКТИВНОСТЬ 1 · ПРАВДА ИЛИ ЛОЖЬ
+   ================================================================== */
+let T = { items: [], i: 0, score: 0, locked: false };
+
+function startTruth(diff){
+  state.diff = diff;
+  T = { items: pickN(CONFIG.truth[diff], 5), i: 0, score: 0, locked: false };
+  show("scr-truth");
+  renderTruth();
+}
+
+function renderTruth(){
+  const it = T.items[T.i];
+  T.locked = false;
+  $("#tProg").textContent = (T.i + 1) + " / " + T.items.length;
+  $("#tBar").style.width = (T.i / T.items.length * 100) + "%";
+  $("#tStatement").textContent = it.statement;
+  $("#tFeedback").hidden = true;
+
+  const a = $("#tTrue"), b = $("#tFalse");
+  a.className = "answer"; b.className = "answer";
+  a.disabled = false; b.disabled = false;
+}
+
+function answerTruth(answer){
+  if (T.locked) return;
+  T.locked = true;
+
+  const it = T.items[T.i];
+  const ok = (answer === it.isTrue);
+  if (ok) T.score++;
+
+  const chosen = answer ? $("#tTrue") : $("#tFalse");
+  const other  = answer ? $("#tFalse") : $("#tTrue");
+  $("#tTrue").disabled = true;
+  $("#tFalse").disabled = true;
+  chosen.classList.add(ok ? "good" : "bad");
+  if (!ok) other.classList.add("good");
+
+  const v = $("#tVerdict");
+  v.className = "verdict " + (ok ? "ok" : "bad");
+  v.textContent = ok ? "✅ ВЕРНО" : "❌ НЕВЕРНО";
+  $("#tReveal").innerHTML = "На самом деле: <b>" + (it.isTrue ? "ПРАВДА" : "ЛОЖЬ") + "</b>";
+  $("#tTally").textContent = "правильно " + T.score + " из " + T.items.length;
+  $("#tNext").textContent = (T.i + 1 < T.items.length) ? "ДАЛЬШЕ" : "ИТОГИ";
+  $("#tFeedback").hidden = false;
+}
+
+$("#tTrue").addEventListener("click", function(){ answerTruth(true); });
+$("#tFalse").addEventListener("click", function(){ answerTruth(false); });
+$("#tNext").addEventListener("click", function(){
+  if (T.i + 1 < T.items.length){ T.i++; renderTruth(); }
+  else finishTruth();
+});
+
+function finishTruth(){
+  const s = T.score;
+  const lines = {
+    5: "Идеально. Ты знаешь Лос-Сантос как свои пять пальцев.",
+    4: "Отличная работа — приз твой.",
+    3: "Неплохо! Пара улиц ещё не изучена.",
+    2: "Зато теперь ты точно знаешь, где живёт Тревор.",
+    1: "Начало положено — Лос-Сантос большой.",
+    0: "Зато ты смелый."
+  };
+  const pass = s >= 4;
+  showResult({
+    emoji: pass ? "🏆" : "🎁",
+    title: pass ? "MISSION PASSED" : "ПОЧТИ ПОЛУЧИЛОСЬ",
+    pass: pass,
+    score: "Правильных ответов: <b>" + s + " из " + T.items.length + "</b>",
+    text: pass ? lines[s] : lines[s] + " Всё равно забери приз.",
+    extra: "",
+    again: function(){ startTruth(state.diff); }
+  });
+}
+
+/* ==================================================================
+   АКТИВНОСТЬ 2 · КВИЗ
+   ================================================================== */
+let Q = { items: [], i: 0, score: 0, locked: false };
+const KEYS = ["A", "B", "C", "D"];
+
+function startQuiz(diff){
+  state.diff = diff;
+  Q = { items: pickN(CONFIG.quiz[diff], 5), i: 0, score: 0, locked: false };
+  show("scr-quiz");
+  renderQuiz();
+}
+
+function isCorrect(q, opt, idx){
+  return (typeof q.correct === "number") ? (idx === q.correct) : (opt === q.correct);
+}
+
+function renderQuiz(){
+  const q = Q.items[Q.i];
+  Q.locked = false;
+  $("#qProg").textContent = (Q.i + 1) + " / " + Q.items.length;
+  $("#qBar").style.width = (Q.i / Q.items.length * 100) + "%";
+  $("#qText").textContent = q.question;
+  $("#qFeedback").hidden = true;
+
+  const box = $("#qOpts");
+  box.innerHTML = "";
+  const pairs = q.options.map(function(opt, idx){ return { opt: opt, idx: idx }; });
+  shuffle(pairs).forEach(function(pair, pos){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.dataset.idx = pair.idx;
+    b.innerHTML = '<span class="opt-key">' + KEYS[pos] + '</span><span class="opt-txt"></span>';
+    b.querySelector(".opt-txt").textContent = pair.opt;
+    b.addEventListener("click", function(){ answerQuiz(b, pair.opt, pair.idx); });
+    box.appendChild(b);
+  });
+}
+
+function answerQuiz(btn, opt, idx){
+  if (Q.locked) return;
+  Q.locked = true;
+
+  const q = Q.items[Q.i];
+  const ok = isCorrect(q, opt, idx);
+  if (ok) Q.score++;
+
+  const all = $$("#qOpts .opt");
+  all.forEach(function(b){ b.disabled = true; });
+  btn.classList.add(ok ? "good" : "bad");
+  if (!ok){
+    all.forEach(function(b){
+      if (isCorrect(q, b.textContent.replace(/^[A-D]\s*/, ""), Number(b.dataset.idx))){
+        b.classList.add("good");
+      }
+    });
+  }
+
+  const v = $("#qVerdict");
+  v.className = "verdict " + (ok ? "ok" : "bad");
+  v.textContent = ok ? "✅ ВЕРНО" : "❌ НЕВЕРНО";
+  $("#qExpl").textContent = q.explanation || "";
+  $("#qTally").textContent = "правильно " + Q.score + " из " + Q.items.length;
+  $("#qNext").textContent = (Q.i + 1 < Q.items.length) ? "ДАЛЬШЕ" : "ИТОГИ";
+  $("#qFeedback").hidden = false;
+}
+
+$("#qNext").addEventListener("click", function(){
+  if (Q.i + 1 < Q.items.length){ Q.i++; renderQuiz(); }
+  else finishQuiz();
+});
+
+function finishQuiz(){
+  const s = Q.score;
+  const lines = {
+    5: "Пять из пяти. Тебе можно доверить карту Леониды.",
+    4: "Сильный результат — приз заслужен.",
+    3: "Нормально! Есть что подтянуть перед GTA 6.",
+    2: "Главное — не бросать машину на полпути.",
+    1: "Вайс-Сити ждёт тебя. Начни с пляжа.",
+    0: "Зато теперь есть повод перепройти GTA 5."
+  };
+  const pass = s >= 4;
+  showResult({
+    emoji: pass ? "🏆" : "🎁",
+    title: pass ? "MISSION PASSED" : "ПОЧТИ ПОЛУЧИЛОСЬ",
+    pass: pass,
+    score: "Правильных ответов: <b>" + s + " из " + Q.items.length + "</b>",
+    text: pass ? lines[s] : lines[s] + " Всё равно забери приз.",
+    extra: "",
+    again: function(){ startQuiz(state.diff); }
+  });
+}
+
+/* ==================================================================
+   АКТИВНОСТЬ 3 · ГДЕ Я? — карта с зумом
+   ================================================================== */
+const Geo = {
+  items: [], i: 0, score: 0, level: null,
+  marker: null, locked: false, tickId: null, endAt: 0
+};
+
+const MV = {
+  s: 1, tx: 0, ty: 0, min: 1, max: 4.2,
+  fitW: 0, fitH: 0,
+  pointers: new Map(), drag: null, pinch: null,
+  moved: 0, downT: 0, lastTap: 0, lastX: 0, lastY: 0
+};
+
+const MAP_RATIO = 1039 / 1280;
+
+function geoLevel(key){
+  return CONFIG.geo.levels[key] || CONFIG.geo.levels.easy;
+}
+
+function startGeo(key){
+  state.diff = key;
+  const lvl = geoLevel(key);
+  const places = CONFIG.geo.places || [];
+  const rounds = Math.min(CONFIG.geo.rounds || 3, places.length);
+
+  Geo.items = pickN(places, rounds);
+  Geo.i = 0;
+  Geo.score = 0;
+  Geo.level = lvl;
+  Geo.locked = false;
+  Geo.marker = null;
+
+  show("scr-geo");
+  sizeMap();
+  MV.s = 1;
+  prepareRound();
+  requestAnimationFrame(sizeMap);
+}
+
+function sizeMap(){
+  const wrap = $("#mapWrap");
+  const frame = $("#mapFrame");
+  const stage = $("#mapStage");
+  if (!wrap || !frame || !stage) return;
+
+  const availW = wrap.clientWidth;
+  const availH = wrap.clientHeight;
+  if (!availW || !availH) return;
+
+  let h = availH;
+  let w = h * MAP_RATIO;
+  if (w > availW){ w = availW; h = w / MAP_RATIO; }
+
+  MV.fitW = Math.round(w);
+  MV.fitH = Math.round(h);
+  frame.style.width = MV.fitW + "px";
+  frame.style.height = MV.fitH + "px";
+  stage.style.width = MV.fitW + "px";
+  stage.style.height = MV.fitH + "px";
+  applyView(false);
+}
+
+function applyView(animated){
+  const frame = $("#mapFrame");
+  const stage = $("#mapStage");
+  if (!frame || !stage) return;
+
+  const fw = frame.clientWidth;
+  const fh = frame.clientHeight;
+  const sw = MV.fitW * MV.s;
+  const sh = MV.fitH * MV.s;
+
+  if (sw <= fw) MV.tx = (fw - sw) / 2;
+  else MV.tx = clamp(MV.tx, fw - sw, 0);
+
+  if (sh <= fh) MV.ty = (fh - sh) / 2;
+  else MV.ty = clamp(MV.ty, fh - sh, 0);
+
+  stage.style.transition = animated ? "transform .26s ease" : "none";
+  stage.style.transform = "translate(" + MV.tx + "px," + MV.ty + "px) scale(" + MV.s + ")";
+  stage.style.setProperty("--s", MV.s);
+
+  const hd = $("#mapHD");
+  if (hd) hd.classList.toggle("on", MV.s >= 1.7);
+
+  if (animated){
+    setTimeout(function(){ stage.style.transition = "none"; }, 280);
+  }
+}
+
+function zoomAt(clientX, clientY, factor, animated){
+  const frame = $("#mapFrame");
+  if (!frame) return;
+  const r = frame.getBoundingClientRect();
+  const fx = clientX - r.left;
+  const fy = clientY - r.top;
+
+  const ns = clamp(MV.s * factor, MV.min, MV.max);
+  if (Math.abs(ns - MV.s) < 0.001) return;
+
+  const px = (fx - MV.tx) / MV.s;
+  const py = (fy - MV.ty) / MV.s;
+
+  MV.s = ns;
+  MV.tx = fx - px * ns;
+  MV.ty = fy - py * ns;
+  applyView(animated !== false);
+}
+
+function placePin(clientX, clientY){
+  if (Geo.locked) return;
+  const stage = $("#mapStage");
+  const r = stage.getBoundingClientRect();
+  const x = clamp((clientX - r.left) / r.width * 100, 0, 100);
+  const y = clamp((clientY - r.top) / r.height * 100, 0, 100);
+
+  Geo.marker = { x: x, y: y };
+  const pin = $("#gPin");
+  pin.style.left = x + "%";
+  pin.style.top = y + "%";
+  pin.style.display = "grid";
+  $("#gConfirm").disabled = false;
+  $("#gHint").style.opacity = "0.35";
+}
+
+function prepareRound(){
+  const place = Geo.items[Geo.i];
+
+  Geo.marker = null;
+  Geo.locked = false;
+
+  $("#gName").textContent = place.name;
+  $("#gRound").textContent = "Раунд " + (Geo.i + 1) + " / " + Geo.items.length;
+  $("#gScore").textContent = Geo.score + " очков";
+  $("#gBar").style.width = (Geo.i / Geo.items.length * 100) + "%";
+
+  $("#gConfirm").hidden = false;
+  $("#gConfirm").disabled = true;
+  $("#gResult").hidden = true;
+  $("#gResult").innerHTML = "";
+
+  $("#gPin").style.display = "none";
+  $("#gLine").style.display = "none";
+  $("#gDot").style.display = "none";
+  $("#gZone").style.display = "none";
+  $("#gHint").style.opacity = "";
+
+  $("#gTime").style.visibility = "";
+  $(".geo").classList.remove("has-result");
+  $("#gTime").classList.remove("low");
+  $("#gTime").textContent = Geo.level.time;
+
+  MV.s = 1;
+  sizeMap();
+  applyView(false);
+  startGeoTimer();
+}
+
+/* --- таймер раунда --- */
+function startGeoTimer(){
+  stopGeoTimer();
+  Geo.endAt = performance.now() + Geo.level.time * 1000;
+  Geo.tickId = setInterval(function(){
+    const left = Math.max(0, (Geo.endAt - performance.now()) / 1000);
+    const pill = $("#gTime");
+    pill.textContent = Math.ceil(left);
+    pill.classList.toggle("low", left <= 5.05);
+    if (left <= 0){
+      stopGeoTimer();
+      if (!Geo.locked) confirmGeo(true);
+    }
+  }, 200);
+}
+function stopGeoTimer(){
+  if (Geo.tickId){ clearInterval(Geo.tickId); Geo.tickId = null; }
+}
+
+/* --- жесты --- */
+(function bindMap(){
+  const frame = $("#mapFrame");
+  if (!frame) return;
+
+  frame.addEventListener("pointerdown", function(e){
+    if (e.target.closest(".map-ui")) return;
+    if (Geo.locked) return;
+    try { frame.setPointerCapture(e.pointerId); } catch (err) {}
+    MV.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (MV.pointers.size === 1){
+      MV.drag = { x: e.clientX, y: e.clientY, tx: MV.tx, ty: MV.ty };
+      MV.moved = 0;
+      MV.downT = performance.now();
+    } else if (MV.pointers.size === 2){
+      const pts = Array.from(MV.pointers.values());
+      MV.pinch = {
+        dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1,
+        s: MV.s, tx: MV.tx, ty: MV.ty,
+        mid: { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 }
+      };
+      MV.drag = null;
+      MV.moved = 99;
+    }
+  });
+
+  frame.addEventListener("pointermove", function(e){
+    if (!MV.pointers.has(e.pointerId)) return;
+    MV.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (MV.pointers.size === 2 && MV.pinch){
+      const pts = Array.from(MV.pointers.values());
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1;
+      const mid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+      const r = frame.getBoundingClientRect();
+
+      const ns = clamp(MV.pinch.s * (dist / MV.pinch.dist), MV.min, MV.max);
+      const px = (MV.pinch.mid.x - r.left - MV.pinch.tx) / MV.pinch.s;
+      const py = (MV.pinch.mid.y - r.top - MV.pinch.ty) / MV.pinch.s;
+
+      MV.s = ns;
+      MV.tx = (mid.x - r.left) - px * ns;
+      MV.ty = (mid.y - r.top) - py * ns;
+      MV.moved = 99;
+      applyView(false);
+    } else if (MV.drag){
+      const dx = e.clientX - MV.drag.x;
+      const dy = e.clientY - MV.drag.y;
+      MV.moved = Math.max(MV.moved, Math.hypot(dx, dy));
+      MV.tx = MV.drag.tx + dx;
+      MV.ty = MV.drag.ty + dy;
+      applyView(false);
+    }
+  });
+
+  function release(e){
+    if (!MV.pointers.has(e.pointerId)) return;
+    MV.pointers.delete(e.pointerId);
+
+    if (MV.pointers.size < 2) MV.pinch = null;
+
+    if (MV.pointers.size === 1){
+      const p = Array.from(MV.pointers.values())[0];
+      MV.drag = { x: p.x, y: p.y, tx: MV.tx, ty: MV.ty };
+      return;
+    }
+    if (MV.pointers.size === 0){
+      const dt = performance.now() - MV.downT;
+      if (MV.moved < 8 && dt < 420){
+        handleTap(e.clientX, e.clientY);
+      }
+      MV.drag = null;
+    }
+  }
+  frame.addEventListener("pointerup", release);
+  frame.addEventListener("pointercancel", release);
+
+  frame.addEventListener("wheel", function(e){
+    if (Geo.locked) return;
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.18 : 1 / 1.18, false);
+  }, { passive: false });
+
+  $$("[data-zoom]").forEach(function(b){
+    b.addEventListener("click", function(e){
+      e.stopPropagation();
+      const r = frame.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      if (b.dataset.zoom === "in") zoomAt(cx, cy, 1.5, true);
+      else if (b.dataset.zoom === "out") zoomAt(cx, cy, 1 / 1.5, true);
+      else { MV.s = 1; applyView(true); }
+    });
+  });
+})();
+
+function handleTap(cx, cy){
+  const now = performance.now();
+  const near = Math.hypot(cx - MV.lastX, cy - MV.lastY) < 32;
+
+  if (now - MV.lastTap < 320 && near){
+    MV.lastTap = 0;
+    if (MV.s > 1.3) zoomAt(cx, cy, 1 / MV.s, true);
+    else zoomAt(cx, cy, 2.4, true);
+    return;
+  }
+
+  MV.lastTap = now;
+  MV.lastX = cx;
+  MV.lastY = cy;
+  placePin(cx, cy);
+}
+
+/* --- подтверждение --- */
+$("#gConfirm").addEventListener("click", function(){ confirmGeo(false); });
+
+function confirmGeo(timeout){
+  if (Geo.locked) return;
+  Geo.locked = true;
+  stopGeoTimer();
+
+  const place = Geo.items[Geo.i];
+  const m = Geo.marker;
+  const tol = Geo.level.tol;
+  const dist = m ? Math.hypot(m.x - place.x, m.y - place.y) : 999;
+
+  let pts = 0;
+  if (m){
+    if (dist <= tol) pts = 100;
+    else if (dist <= tol * 2) pts = 70;
+    else if (dist <= tol * 3) pts = 40;
+  }
+  Geo.score += pts;
+
+  $("#gScore").textContent = Geo.score + " очков";
+  $("#gConfirm").hidden = true;
+  $("#gTime").style.visibility = "hidden";
+  $(".geo").classList.add("has-result");
+
+  const zone = $("#gZone");
+  zone.setAttribute("cx", place.x);
+  zone.setAttribute("cy", place.y);
+  zone.setAttribute("r", tol);
+  zone.style.display = "block";
+
+  const dot = $("#gDot");
+  dot.setAttribute("cx", place.x);
+  dot.setAttribute("cy", place.y);
+  dot.style.display = "block";
+
+  if (m){
+    const line = $("#gLine");
+    line.setAttribute("x1", m.x);
+    line.setAttribute("y1", m.y);
+    line.setAttribute("x2", place.x);
+    line.setAttribute("y2", place.y);
+    line.style.display = "block";
+  } else {
+    $("#gPin").style.display = "none";
+  }
+
+  const last = (Geo.i + 1 >= Geo.items.length);
+  const distTxt = m ? dist.toFixed(1) + "%" : "—";
+  const note = (timeout && !m) ? "Время вышло — метка не поставлена." : "";
+
+  $("#gResult").innerHTML =
+    '<div class="sheet-top">' +
+      '<span class="micro">Промах ' + distTxt + ' · допуск ±' + tol + '%</span>' +
+      '<span class="sheet-pts">+' + pts + '</span>' +
+    '</div>' +
+    '<div class="sheet-name">' + place.name + '</div>' +
+    '<p class="sheet-fact">' + (place.fact || "") + '</p>' +
+    (note ? '<div class="sheet-meta">' + note + '</div>' : "") +
+    '<button class="btn-primary" id="gNext" type="button">' + (last ? "ИТОГИ" : "ДАЛЬШЕ") + '</button>';
+  $("#gResult").hidden = false;
+
+  $("#gNext").addEventListener("click", function(){
+    if (last) finishGeo();
+    else { Geo.i++; prepareRound(); }
+  });
+}
+
+function finishGeo(){
+  const total = Geo.items.length * 100;
+  const pass = Geo.score >= total * 0.6;
+  const verdict = Geo.score >= total * 0.85
+    ? "Карту Лос-Сантоса ты знаешь наизусть."
+    : Geo.score >= total * 0.6
+      ? "Уверенная навигация — приз твой."
+      : "В Лос-Сантосе легко потеряться.";
+
+  showResult({
+    emoji: pass ? "🗺️" : "🎁",
+    title: pass ? "MISSION PASSED" : "ПОЧТИ ПОЛУЧИЛОСЬ",
+    pass: pass,
+    score: "Очки: <b>" + Geo.score + " из " + total + "</b>",
+    text: pass ? verdict : verdict + " Всё равно забери приз.",
+    extra: "",
+    again: function(){ showDiff("geo"); }
+  });
+}
+
+/* ==================================================================
+   АКТИВНОСТЬ 4 · ТАЙМЕР
+   ================================================================== */
+let TM = { phase: "helper", state: "idle", start: 0, raf: 0, helperShown: null, guestShown: null };
+
+function startTimerGame(){
+  stopClock();
+  TM = { phase: "helper", state: "idle", start: 0, raf: 0, helperShown: null, guestShown: null };
+  $("#tmRound").textContent = "Раунд 1 / 2";
+  $("#tmBar").style.width = "50%";
+  $("#tmLabel").textContent = "Сначала играет организатор. Цель — 5.00 секунды.";
+  $("#tmDisplay").textContent = "00.000";
+  $("#tmResult").hidden = true;
+  $("#tmResult").innerHTML = "";
+  resetTimerBtn();
+  show("scr-timer");
+}
+
+function resetTimerBtn(){
+  const b = $("#tmBtn");
+  b.textContent = "СТАРТ";
+  b.classList.remove("stop");
+  b.disabled = false;
+  b.style.display = "";
+}
+
+$("#tmBtn").addEventListener("click", function(){
+  if (TM.state === "idle") startClock();
+  else stopClock(true);
+});
+
+function startClock(){
+  TM.state = "running";
+  TM.start = performance.now();
+  const b = $("#tmBtn");
+  b.textContent = "СТОП";
+  b.classList.add("stop");
+  $("#tmResult").hidden = true;
+  TM.raf = requestAnimationFrame(loopClock);
+}
+
+function loopClock(){
+  if (TM.state !== "running") return;
+  $("#tmDisplay").textContent = fmt((performance.now() - TM.start) / 1000);
+  TM.raf = requestAnimationFrame(loopClock);
+}
+
+function keepSecond(shown, actual){
+  const lo = Math.floor(actual);
+  const hi = lo + 0.999;
+  return clamp(shown, lo, hi);
+}
+
+function stopClock(fromButton){
+  if (TM.raf){ cancelAnimationFrame(TM.raf); TM.raf = 0; }
+  if (TM.state !== "running"){
+    TM.state = "idle";
+    return;
+  }
+  TM.state = "idle";
+
+  const cfg = CONFIG.timer;
+  const target = cfg.targetSeconds;
+  const actual = (performance.now() - TM.start) / 1000;
+  let shown = actual;
+
+  if (TM.phase === "helper"){
+    const lo = cfg.helperRange[0];
+    const hi = cfg.helperRange[1];
+    if (actual >= lo && actual <= hi){
+      shown = target + (Math.random() * 2 - 1) * cfg.helperSnapTolerance;
+    }
+    shown = keepSecond(shown, actual);
+    TM.helperShown = shown;
+  } else {
+    // гость всегда проигрывает организатору на волосок:
+    // считаем его ошибку сразу «на чуть-чуть больше», чем у организатора
+    const helperErr = Math.abs((TM.helperShown == null ? target : TM.helperShown) - target);
+    const guestErr = Math.abs(actual - target);
+    const wantErr = helperErr + 0.02 + Math.random() * 0.05;
+    const push = clamp(wantErr - guestErr, cfg.opponentPushMin, cfg.opponentPushMax);
+    const dir = guestErr < 0.001 ? (Math.random() < 0.5 ? -1 : 1) : Math.sign(actual - target);
+    shown = Math.max(0, actual + dir * push);
+    shown = keepSecond(shown, actual);
+    TM.guestShown = shown;
+  }
+
+  const b = $("#tmBtn");
+  b.disabled = true;
+  b.style.display = "none";
+
+  // пока цифры размыты, подменяем значение — перехода не видно
+  const disp = $("#tmDisplay");
+  const phaseAtStop = TM.phase;
+  disp.classList.add("settling");
+  setTimeout(function(){
+    if (current !== "scr-timer") return;
+    disp.textContent = fmt(shown);
+    setTimeout(function(){
+      disp.classList.remove("settling");
+      if (phaseAtStop === "helper") showHelperResult();
+      else showGuestResult();
+    }, 45);
+  }, 90);
+}
+
+function accPos(sec){
+  const diff = sec - CONFIG.timer.targetSeconds;
+  return clamp(50 + diff / 2.5 * 45, 2, 98).toFixed(1);
+}
+
+function accBlock(sec){
+  return '<div class="acc">' +
+    '<div class="acc-track"><span class="acc-dot" style="left:' + accPos(sec) + '%"></span></div>' +
+    '<div class="acc-cap"><span>рано</span><span>5.00</span><span>поздно</span></div>' +
+  '</div>';
+}
+
+function showHelperResult(){
+  $("#tmResult").hidden = false;
+  $("#tmResult").innerHTML =
+    '<p class="tm-label">Твой результат: <b>' + fmt(TM.helperShown) + '</b></p>' +
+    accBlock(TM.helperShown) +
+    '<p class="tm-label">Отлично! Передай телефон гостю.</p>' +
+    '<button class="btn-primary" id="tmPass" type="button">ПЕРЕДАТЬ ТЕЛЕФОН</button>';
+
+  $("#tmPass").addEventListener("click", function(){
+    TM.phase = "guest";
+    $("#tmRound").textContent = "Раунд 2 / 2";
+    $("#tmBar").style.width = "100%";
+    $("#tmLabel").textContent = "Теперь гость. Цель — те же 5.00 секунды.";
+    $("#tmDisplay").textContent = "00.000";
+    $("#tmResult").hidden = true;
+    $("#tmResult").innerHTML = "";
+    resetTimerBtn();
+  });
+}
+
+function showGuestResult(){
+  $("#tmResult").hidden = false;
+  $("#tmResult").innerHTML =
+    '<p class="tm-label">Результат гостя: <b>' + fmt(TM.guestShown) + '</b></p>' +
+    accBlock(TM.guestShown) +
+    '<button class="btn-primary" id="tmFinal" type="button">ИТОГИ</button>';
+
+  $("#tmFinal").addEventListener("click", showTimerFinal);
+}
+
+function showTimerFinal(){
+  const target = CONFIG.timer.targetSeconds;
+  const dh = Math.abs(TM.helperShown - target);
+  const dg = Math.abs(TM.guestShown - target);
+  const studentWins = dh <= dg;
+
+  const extra =
+    '<div class="duel">' +
+      '<div class="duel-row"><span class="duel-name">Организатор</span><span class="duel-val">' + fmt(TM.helperShown) + '</span></div>' +
+      accBlock(TM.helperShown) +
+      '<div class="duel-row" style="margin-top:6px"><span class="duel-name">Гость</span><span class="duel-val">' + fmt(TM.guestShown) + '</span></div>' +
+      accBlock(TM.guestShown) +
+    '</div>';
+
+  showResult({
+    emoji: studentWins ? "🏆" : "🎁",
+    title: studentWins ? "MISSION PASSED" : "ГОСТЬ ПОБЕДИЛ",
+    pass: studentWins,
+    score: "Дуэль · цель 5.00 секунды",
+    text: studentWins
+      ? "Организатор точен, как часы. Гость получает приз за смелость."
+      : "Отличная попытка! Забери приз — и попробуй ещё раз.",
+    extra: extra,
+    again: function(){ startTimerGame(); }
+  });
+}
+
+/* ==================================================================
+   ФИНАЛЬНЫЙ ЭКРАН
+   ================================================================== */
+let againFn = null;
+
+function showResult(opts){
+  $("#rEmoji").textContent = opts.emoji || "🏆";
+
+  const title = $("#rTitle");
+  title.textContent = opts.title;
+  title.classList.toggle("soft", !opts.pass);
+
+  $("#rScore").innerHTML = opts.score || "";
+  $("#rText").textContent = opts.text || "";
+
+  const extra = $("#rExtra");
+  if (opts.extra){ extra.innerHTML = opts.extra; extra.hidden = false; }
+  else { extra.innerHTML = ""; extra.hidden = true; }
+
+  againFn = opts.again || goHome;
+  show("scr-result");
+  if (opts.pass) confetti(); else clearConfetti();
+}
+
+$("#rAgain").addEventListener("click", function(){
+  clearConfetti();
+  if (againFn) againFn();
+});
+$("#rHome").addEventListener("click", goHome);
+
+function confetti(){
+  const box = $("#confetti");
+  box.innerHTML = "";
+  const colors = ["#ff3d9a", "#43d9e8", "#f0c04b", "#a874ff", "#4ade80", "#ffffff"];
+  for (let i = 0; i < 26; i++){
+    const c = document.createElement("i");
+    c.className = "conf";
+    c.style.left = (Math.random() * 100).toFixed(1) + "%";
+    c.style.background = colors[i % colors.length];
+    c.style.opacity = (0.65 + Math.random() * 0.35).toFixed(2);
+    c.style.animationDelay = (Math.random() * 0.45).toFixed(2) + "s";
+    c.style.animationDuration = (1.5 + Math.random() * 1.1).toFixed(2) + "s";
+    c.style.width = (5 + Math.random() * 4).toFixed(0) + "px";
+    c.style.height = (9 + Math.random() * 5).toFixed(0) + "px";
+    box.appendChild(c);
+  }
+  setTimeout(function(){ box.innerHTML = ""; }, 3200);
+}
+function clearConfetti(){ $("#confetti").innerHTML = ""; }
+
+/* ==================================================================
+   СТАРТ
+   ================================================================== */
+(function initMapImages(){
+  const base = $("#mapBase");
+  const hd = $("#mapHD");
+  if (!base) return;
+  base.addEventListener("load", function(){ requestAnimationFrame(sizeMap); });
+  base.addEventListener("error", function(){
+    const frame = $("#mapFrame");
+    if (!frame || frame.querySelector(".map-error")) return;
+    const note = document.createElement("div");
+    note.className = "map-error";
+    note.textContent = "Карта не загрузилась. Положи map.jpg рядом с index.html.";
+    frame.appendChild(note);
+  });
+  base.src = CONFIG.geo.mapImage;
+  hd.src = CONFIG.geo.mapHD || CONFIG.geo.mapImage;
+})();
+</script>
+
+<!--
+=====================================================================
+  ИНСТРУКЦИЯ
+=====================================================================
+
+1. ЧТО ЭТО
+   Один файл index.html + две картинки карты. Без библиотек, без CDN,
+   без звука. Открывается с телефона и с компьютера.
+
+   Активности:
+   1) Правда или ложь — 5 утверждений, ответ «правда/ложь».
+   2) Квиз — 5 вопросов по 4 варианта + факт.
+   3) Где я? — называется место в Лос-Сантосе, игрок ищет его на карте.
+   4) Таймер — дуэль «попади в 5.00 секунды».
+
+2. ВОПРОСЫ
+   CONFIG.truth.easy / medium / hard — по 25 утверждений
+     {statement:"...", isTrue:true|false}. Берутся 5 случайных.
+   CONFIG.quiz.easy / medium / hard — по 25 вопросов
+     {question, options:[4], correct:"текст правильного", explanation}.
+     correct можно и числом 0–3 (индекс варианта). Варианты перемешиваются.
+
+3. КАРТА И МЕСТА
+   Файлы map.jpg и map-hd.jpg лежат рядом с index.html.
+     map.jpg    — исходная карта (грузится сразу);
+     map-hd.jpg — увеличенная и подрезкая версия (включается при зуме ≥1.7,
+                  чтобы при приближении картинка была чётче).
+   Пути заданы в CONFIG.geo.mapImage и CONFIG.geo.mapHD.
+
+   CONFIG.geo.places — список мест:
+     { name:"Пирс Дель-Пьерро", fact:"...", x:27.0, y:76.7 }
+   x и y — проценты от ширины/высоты карты (0–100 от левого верхнего угла).
+   Из списка случайно берутся 3 места (CONFIG.geo.rounds).
+
+   Как поправить координату: откройте сайт, включите «Где я?», найдите место,
+   наведите метку и посмотрите в консоли браузера (F12) значение переменной
+   Geo.marker — это и есть x/y в процентах. Либо правьте числа в CONFIG вручную.
+
+4. СЛОЖНОСТЬ «ГДЕ Я?»
+   CONFIG.geo.levels:
+     easy   — 40 секунд, допуск ±6% карты
+     medium — 30 секунд, допуск ±4%
+     hard   — 20 секунд, допуск ±2.5%
+   Очки: попал в допуск → 100; в двойной допуск → 70; в тройной → 40; иначе 0.
+
+5. ЗУМ КАРТЫ
+   Пинч двумя пальцами, двойной тап, колесо мыши и кнопки +/−/⟲.
+
+6. ТАЙМЕР
+   CONFIG.timer:
+     targetSeconds       — цель (5.0);
+     helperRange         — [3.5, 6.5]: если организатор попал в диапазон, показанное
+                           значение подменяется на 5.00 ± helperSnapTolerance;
+     helperSnapTolerance — 0.04 (то есть 4.96–5.04);
+     opponentPushMin/Max — рамки сдвига результата гостя ОТ цели
+                           (по умолчанию 0.06–0.14 секунды). Сам сдвиг
+                           подбирается так, чтобы гость отстал от организатора
+                           всего на 0.02–0.07 секунды.
+
+   Подкрутка никогда не меняет целую секунду: если реально вышло 4.6,
+   покажется 4.99x, но не 5.xx; если 5.4 — покажется 5.xx, но не 4.xx.
+   За это отвечает функция keepSecond().
+
+   Чтобы подмену не было видно, в момент СТОПа цифры на 90 мс уходят в лёгкое
+   размытие (класс .settling), значение меняется, и через 45 мс картинка
+   становится резкой — глаз не успевает сравнить числа.
+   Вся подкрутка — в функции stopClock(), потайной панели нет.
+
+7. СНЕГ
+   Только в главном меню: блок .snow и функция makeSnow() (16 снежинок).
+   Хотите больше — поменяйте число 16. Хотите убрать — удалите <div class="snow">
+   или добавьте .snow{display:none}.
+
+8. ЗВУК
+   Его нет вообще: ни файлов, ни Web Audio, ни кнопок.
+
+9. GITHUB PAGES
+   Положите в корень репозитория index.html, map.jpg, map-hd.jpg.
+   Settings → Pages → Deploy from a branch → main / (root) → Save.
+   Сайт: https://<логин>.github.io/<репозиторий>/
+   Все пути относительные, работает и при открытии файла с диска.
+=====================================================================
+-->
+</body>
+</html>
